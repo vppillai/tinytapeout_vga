@@ -1,0 +1,19 @@
+# 1. CLOCK & RESET
+set_io CLK 21
+# We map Reset to Pin 44 (unused).
+# IMPORTANT: To reset the chip, you must physically bridge Pin 44 to 3.3V briefly.
+# If you don't do this, the chip starts running immediately (which is fine).
+set_io BTN_N 44 
+
+# 2. TINY VGA PMOD (mole99) MAPPING for J2 Header
+# Top Row
+set_io VGA_R[1]  78  # Pin 1: Red MSB
+set_io VGA_G[1]  79  # Pin 2: Green MSB
+set_io VGA_B[1]  80  # Pin 3: Blue MSB
+set_io VGA_VSYNC 81  # Pin 4: VSync
+
+# Bottom Row
+set_io VGA_R[0]  87  # Pin 7: Red LSB
+set_io VGA_G[0]  88  # Pin 8: Green LSB
+set_io VGA_B[0]  90  # Pin 9: Blue LSB
+set_io VGA_HSYNC 91  # Pin 10: HSync
