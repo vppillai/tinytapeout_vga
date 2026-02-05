@@ -1,0 +1,20 @@
+commands = [
+  "mkdir -p test",
+  "chmod +x test/run_tests.sh",
+  "uv sync && cd test && uv run make",
+  "uv python install 3.13 && uv venv --python 3.13 && uv sync && cd test && uv run make",
+  "uv python pin 3.13 && rm -rf .venv && uv venv --python 3.13 && uv sync",
+  "cd test && uv run make",
+  "uv sync && uv run apio packages --install oss-cad-suite",
+  "uv run apio packages -h",
+  "uv run apio packages update",
+  "uv run apio:*",
+  "find:*",
+  "cd test && uv run make clean && uv run make",
+  "cd test && uv run apio:*",
+  "cat:*",
+  "mv test/:*",
+  "rm -f test/Makefile test/test_vga.py test/run_tests.sh",
+  "uv sync:*",
+  "rm -f tb_vga_tt.vcd \"uv copy.lock\" && rm -rf test/sim_build"
+]

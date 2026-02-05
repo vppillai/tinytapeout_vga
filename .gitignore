@@ -9,3 +9,14 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Simulation artifacts
+sim_build/
+*.vcd
+*.out
+*.vvp
+
+# Editor/IDE
+*.swp
+*~
+.DS_Store
