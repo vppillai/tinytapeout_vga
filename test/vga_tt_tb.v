@@ -64,7 +64,7 @@ module vga_tt_tb;
     integer color_changes;
 
     // Instantiate DUT
-    tt_um_vga_example dut (
+    tt_um_embeddedinn_vga dut (
         .ui_in   (ui_in),
         .uo_out  (uo_out),
         .uio_in  (uio_in),

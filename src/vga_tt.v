@@ -1,136 +1,133 @@
 `default_nettype none
-/* verilator lint_off UNUSED */
-/* verilator lint_off WIDTH */
 
-module tt_um_vga_example(
-  input  wire [7:0] ui_in,    // Switches
-  output wire [7:0] uo_out,   // VGA Pins
-  input  wire [7:0] uio_in,   // IOs
-  output wire [7:0] uio_out,  // IOs
-  output wire [7:0] uio_oe,   // IOs
-  input  wire       ena,      // Power
-  input  wire       clk,      // Clock
-  input  wire       rst_n     // Reset
+/* * Project: Cyber EMBEDDEDINN
+ * Description: A single-tile VGA design for Tiny Tapeout.
+ * Features:
+ * - Generative block font (no ROM required)
+ * - 640x480 @ 60Hz VGA timing
+ * - Parallax starfield background
+ * - Rock-solid stable animation
+ */
+
+module tt_um_embeddedinn_vga(
+    input  wire [7:0] ui_in,    // Dedicated inputs
+    output wire [7:0] uo_out,   // Dedicated outputs: VGA Pins (PMOD Standard)
+    input  wire [7:0] uio_in,   // IOs: Input path
+    output wire [7:0] uio_out,  // IOs: Output path
+    output wire [7:0] uio_oe,   // IOs: Enable path
+    input  wire       ena,      // Will be high when the design is enabled
+    input  wire       clk,      // 25.175 MHz clock for VGA 640x480
+    input  wire       rst_n     // Reset (Active Low)
 );
 
-  // 1. STANDARD SETUP
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+    // =========================================================================
+    // 1. PIN & SIGNAL ASSIGNMENTS
+    // =========================================================================
+    assign uio_out = 8'b0;
+    assign uio_oe  = 8'b0;
 
-  // 2. VGA SIGNALS
-  wire hsync;
-  wire vsync;
-  wire video_active;
-  wire [9:0] pix_x;
-  wire [9:0] pix_y;
+    wire hsync, vsync, video_active;
+    wire [9:0] pix_x, pix_y;
 
-  // 3. HOOK UP TO THE HIDDEN LIBRARY
-  // We use the simulator's built-in generator so the web canvas updates.
-  hvsync_generator hvsync_gen(
-    .clk(clk),
-    .reset(~rst_n), // Invert reset (Active Low -> Active High)
-    .hsync(hsync),
-    .vsync(vsync),
-    .display_on(video_active),
-    .hpos(pix_x),
-    .vpos(pix_y)
-  );
+    // =========================================================================
+    // 2. VGA SYNC GENERATOR
+    // =========================================================================
+    hvsync_generator hvsync_gen(
+        .clk(clk),
+        .reset(~rst_n),
+        .hsync(hsync),
+        .vsync(vsync),
+        .display_on(video_active),
+        .hpos(pix_x),
+        .vpos(pix_y)
+    );
 
-  // =========================================================================
-  // 4. THE LIQUID PLASMA ENGINE
-  // =========================================================================
+    // =========================================================================
+    // 3. ANIMATION TIMERS (Clean Bouncing)
+    // =========================================================================
+    reg [15:0] frame_cnt;
+    reg [8:0] tx, ty;
+    reg x_dir, y_dir;
 
-  // --- A. ORB MOVEMENT PHYSICS ---
-  reg [9:0] orb1_x, orb1_y;
-  reg [9:0] orb2_x, orb2_y;
+    always @(posedge vsync or negedge rst_n) begin
+        if (~rst_n) begin
+            frame_cnt <= 0;
+            tx <= 100; ty <= 100;
+            x_dir <= 0; y_dir <= 0;
+        end else begin
+            frame_cnt <= frame_cnt + 1;
 
-  reg dir1_x, dir1_y;
-  reg dir2_x, dir2_y;
+            // Linear Movement
+            tx <= x_dir ? tx - 1 : tx + 1;
+            ty <= y_dir ? ty - 1 : ty + 1;
 
-  // Initialize for Simulator (prevents black screen start)
-  initial begin
-      orb1_x = 300; orb1_y = 200;
-      orb2_x = 340; orb2_y = 280;
-      dir1_x = 1;   dir1_y = 1;
-      dir2_x = 0;   dir2_y = 1;
-  end
+            // Screen boundary checks for 640x480
+            if (tx >= 280) x_dir <= 1; else if (tx <= 10) x_dir <= 0;
+            if (ty >= 420) y_dir <= 1; else if (ty <= 10) y_dir <= 0;
+        end
+    end
 
-  always @(posedge vsync or negedge rst_n) begin
-      if (~rst_n) begin
-          orb1_x <= 300; orb1_y <= 200;
-          orb2_x <= 340; orb2_y <= 280;
-          dir1_x <= 1;   dir1_y <= 1;
-          dir2_x <= 0;   dir2_y <= 1;
-      end else begin
-          // ORB 1 (Speed 2)
-          if (dir1_x) begin if (orb1_x >= 630) dir1_x <= 0; else orb1_x <= orb1_x + 2; end
-          else        begin if (orb1_x <= 10)  dir1_x <= 1; else orb1_x <= orb1_x - 2; end
+    // =========================================================================
+    // 4. GENERATIVE FONT ENGINE (Modern & Spaced)
+    // =========================================================================
+    wire [9:0] rx = pix_x - {1'b0, tx};
+    wire [9:0] ry = pix_y - {1'b0, ty};
 
-          if (dir1_y) begin if (orb1_y >= 470) dir1_y <= 0; else orb1_y <= orb1_y + 2; end
-          else        begin if (orb1_y <= 10)  dir1_y <= 1; else orb1_y <= orb1_y - 2; end
+    // Each character is given a 32px slot
+    wire [3:0] char_idx = rx[8:5];
+    wire [4:0] lx = rx[4:0];
+    wire [3:0] ly = ry[5:2];
 
-          // ORB 2 (Speed 3)
-          if (dir2_x) begin if (orb2_x >= 630) dir2_x <= 0; else orb2_x <= orb2_x + 3; end
-          else        begin if (orb2_x <= 10)  dir2_x <= 1; else orb2_x <= orb2_x - 3; end
+    // Shape Primitives (Construct letters from bars to save gate space)
+    wire left_bar   = (lx < 4);
+    wire right_bar  = (lx >= 16 && lx < 20);
+    wire top_bar    = (ly == 0);
+    wire mid_bar    = (ly == 5);
+    wire bot_bar    = (ly == 9);
+    wire corner     = (top_bar || bot_bar || mid_bar) && right_bar;
 
-          if (dir2_y) begin if (orb2_y >= 470) dir2_y <= 0; else orb2_y <= orb2_y + 3; end
-          else        begin if (orb2_y <= 10)  dir2_y <= 1; else orb2_y <= orb2_y - 3; end
-      end
-  end
+    reg pix;
+    always @(*) begin
+        pix = 0;
+        // Draw characters only if within the 11-char block and within the 20px letter width
+        if (rx < 352 && ry < 40 && lx < 20) begin
+            case (char_idx)
+                4'd0, 4'd3, 4'd6: pix = left_bar || top_bar || mid_bar || bot_bar; // E
+                4'd1:             pix = left_bar || right_bar || (lx >= 8 && lx < 12 && ly < 6); // M
+                4'd2:             pix = (left_bar || right_bar || top_bar || mid_bar || bot_bar) && !corner; // B
+                4'd4, 4'd5, 4'd7: pix = left_bar || ((top_bar || bot_bar) && lx < 16) || (right_bar && !top_bar && !bot_bar); // D
+                4'd8:             pix = (lx >= 8 && lx < 12); // I
+                4'd9, 4'd10:      pix = left_bar || right_bar || (ly == lx[4:2] + 2); // N
+                default:          pix = 0;
+            endcase
+        end
+    end
 
-  // --- B. DISTANCE FIELD CALCULATOR ---
-  // Approximate Distance Squared: (x-x1)^2 + (y-y1)^2
+    // =========================================================================
+    // 5. COLOR MIXER (Clean Aesthetic)
+    // =========================================================================
+    // Starfield: Moving XOR pattern
+    wire star = (pix_x[4:0] ^ frame_cnt[4:0]) == (pix_y[4:0] ^ frame_cnt[9:5]);
+    wire scanline = pix_y[0];
 
-  wire [9:0] dx1 = (pix_x > orb1_x) ? (pix_x - orb1_x) : (orb1_x - pix_x);
-  wire [9:0] dy1 = (pix_y > orb1_y) ? (pix_y - orb1_y) : (orb1_y - pix_y);
+    // Final color selection: White text over deep blue/purple stars
+    wire [1:0] r = video_active ? (pix ? 2'b11 : (star ? 2'b10 : 2'b00)) : 2'b00;
+    wire [1:0] g = video_active ? (pix ? 2'b11 : 2'b00) : 2'b00;
+    wire [1:0] b = video_active ? (pix ? 2'b11 : (scanline ? 2'b10 : 2'b01)) : 2'b00;
 
-  wire [9:0] dx2 = (pix_x > orb2_x) ? (pix_x - orb2_x) : (orb2_x - pix_x);
-  wire [9:0] dy2 = (pix_y > orb2_y) ? (pix_y - orb2_y) : (orb2_y - pix_y);
+    // Output Packing for TinyVGA PMOD
+    assign uo_out = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
 
-  // Downsample to keep math small (6-bit multiply)
-  wire [5:0] small_dx1 = dx1[9:4];
-  wire [5:0] small_dy1 = dy1[9:4];
-  wire [5:0] small_dx2 = dx2[9:4];
-  wire [5:0] small_dy2 = dy2[9:4];
-
-  wire [12:0] dist1 = (small_dx1 * small_dx1) + (small_dy1 * small_dy1);
-  wire [12:0] dist2 = (small_dx2 * small_dx2) + (small_dy2 * small_dy2);
-
-  // --- C. INTERFERENCE COMPOSITION ---
-  // Average the fields to create merging blobs
-  wire [12:0] field = (dist1 + dist2);
-
-  // --- D. COLOR MAPPING ---
-  reg [1:0] r, g, b;
-
-  // Use bits [8:5] to create the "Rings" effect
-  wire [3:0] palette_idx = field[8:5];
-
-  always @(*) begin
-      if (!video_active) begin
-          r = 0; g = 0; b = 0;
-      end else begin
-          // Liquid Palette
-          case (palette_idx)
-             4'd0:  begin r=3; g=3; b=3; end // White Core
-             4'd1:  begin r=3; g=3; b=0; end // Yellow
-             4'd2:  begin r=3; g=0; b=0; end // Red
-             4'd3:  begin r=2; g=0; b=1; end // Magenta
-             4'd4:  begin r=0; g=0; b=3; end // Blue
-             4'd5:  begin r=0; g=2; b=3; end // Cyan
-             4'd6:  begin r=0; g=3; b=0; end // Green
-             4'd7:  begin r=0; g=1; b=0; end // Fade
-             default: begin r=0; g=0; b=0; end // Void
-          endcase
-      end
-  end
-
-  // 5. OUTPUT ASSIGNMENT
-  assign uo_out = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
+    // =========================================================================
+    // 6. LINTER TRAP
+    // =========================================================================
+    wire _unused = &{ui_in, uio_in, ena, frame_cnt[15:10], ry[9:6]};
 
 endmodule
 
-// PASTE THIS AT THE BOTTOM FOR TAPEOUT
+// =========================================================================
+// VGA TIMING GENERATOR (640x480 @ 60Hz)
+// =========================================================================
 module hvsync_generator(
     input clk,
     input reset,
