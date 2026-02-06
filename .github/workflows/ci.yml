@@ -116,3 +116,52 @@ jobs:
             vga_output.gif
             vga_preview.gif
           overwrite: true
+
+  sync-tt:
+    name: Sync to TinyTapeout Repo
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          path: vga_tt
+
+      - name: Checkout TinyTapeout repo
+        uses: actions/checkout@v4
+        with:
+          repository: vppillai/tinytapeout-ihp-26a
+          token: ${{ secrets.TT_REPO_TOKEN }}
+          path: tt-repo
+
+      - name: Sync files to TT repo
+        run: |
+          TT_PROJECT="tt-repo/projects/tt_um_embeddedinn_vga"
+
+          # Ensure directories exist
+          mkdir -p "$TT_PROJECT/src"
+          mkdir -p "$TT_PROJECT/test"
+
+          # Copy source files
+          cp vga_tt/src/vga_tt.v "$TT_PROJECT/src/"
+          cp vga_tt/src/info.yaml "$TT_PROJECT/"
+
+          # Copy test files
+          cp vga_tt/test/Makefile "$TT_PROJECT/test/"
+          cp vga_tt/test/tb.v "$TT_PROJECT/test/"
+          cp vga_tt/test/test.py "$TT_PROJECT/test/"
+
+      - name: Commit and push to TT repo
+        run: |
+          cd tt-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to sync"
+          else
+            git commit -m "Sync from vga_tt repo"
+            git push
+          fi
