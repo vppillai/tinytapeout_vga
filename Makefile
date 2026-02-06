@@ -71,8 +71,9 @@ test:
 	cd test && uv run apio raw -- make
 
 # Generate VGA output GIF from simulation (fast Verilator-based)
+# Captures 60 consecutive frames (1 second at 60Hz VGA)
 gif:
-	@echo "Building fast VGA simulator with Verilator..."
+	@echo "Building VGA simulator with Verilator..."
 	@mkdir -p test/obj_dir
 	cd test && uv run apio raw -- verilator --cc --exe -O3 \
 		-Wno-fatal --top-module tt_um_embeddedinn_vga \
@@ -81,16 +82,6 @@ gif:
 	@echo "Capturing VGA frames..."
 	cd test && ./obj_dir/vga_sim
 	@echo "Converting to animated GIF..."
-	cd test && uv run python make_gif.py
-	@mv test/vga_output.gif . 2>/dev/null || true
-	@rm -f test/vga_frames.bin
-	@echo "GIF saved: vga_output.gif"
-
-# Generate VGA GIF using slow cocotb simulation (fallback)
-gif-slow:
-	@echo "Step 1: Capturing VGA frames from simulation (slow)..."
-	cd test && uv run apio raw -- make MODULE=vga_capture
-	@echo "Step 2: Converting to animated GIF..."
 	cd test && uv run python make_gif.py
 	@mv test/vga_output.gif . 2>/dev/null || true
 	@rm -f test/vga_frames.bin

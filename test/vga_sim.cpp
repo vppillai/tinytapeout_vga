@@ -21,8 +21,8 @@ const int V_BACK = 33;
 const int V_TOTAL = 525;
 
 // Configuration
-const int NUM_FRAMES = 30;
-const int FRAME_SKIP = 2;
+const int NUM_FRAMES = 60;  // Capture 60 consecutive frames (1 second at 60Hz)
+const int FRAME_SKIP = 0;   // No skipping - capture every frame
 
 // 2-bit to 8-bit color mapping
 const uint8_t COLOR_MAP[] = {0, 85, 170, 255};
@@ -111,10 +111,12 @@ int main(int argc, char** argv) {
 
         fwrite(frame_data.data(), 1, frame_data.size(), outfile);
 
-        // Skip frames
-        for (int skip = 0; skip < FRAME_SKIP; skip++) {
-            while ((dut->uo_out & 0x08) == 0) { dut->clk = !dut->clk; dut->eval(); dut->clk = !dut->clk; dut->eval(); }
-            while ((dut->uo_out & 0x08) != 0) { dut->clk = !dut->clk; dut->eval(); dut->clk = !dut->clk; dut->eval(); }
+        // Skip frames (if configured)
+        if (FRAME_SKIP > 0) {
+            for (int skip = 0; skip < FRAME_SKIP; skip++) {
+                while ((dut->uo_out & 0x08) == 0) { dut->clk = !dut->clk; dut->eval(); dut->clk = !dut->clk; dut->eval(); }
+                while ((dut->uo_out & 0x08) != 0) { dut->clk = !dut->clk; dut->eval(); dut->clk = !dut->clk; dut->eval(); }
+            }
         }
     }
 
