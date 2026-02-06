@@ -70,12 +70,30 @@ test:
 	@echo "Running cocotb tests..."
 	cd test && uv run apio raw -- make
 
-# Generate VGA output GIF from simulation
-# Captures frames and creates animated GIF for visual validation
+# Generate VGA output GIF from simulation (fast Verilator-based)
 gif:
-	@echo "Generating VGA output GIF..."
-	cd test && uv run apio raw -- make MODULE=vga_capture
+	@echo "Building fast VGA simulator with Verilator..."
+	@mkdir -p test/obj_dir
+	cd test && uv run apio raw -- verilator --cc --exe -O3 \
+		-Wno-fatal --top-module tt_um_embeddedinn_vga \
+		../src/vga_tt.v vga_sim.cpp -o vga_sim
+	cd test/obj_dir && make -f Vtt_um_embeddedinn_vga.mk
+	@echo "Capturing VGA frames..."
+	cd test && ./obj_dir/vga_sim
+	@echo "Converting to animated GIF..."
+	cd test && uv run python make_gif.py
 	@mv test/vga_output.gif . 2>/dev/null || true
+	@rm -f test/vga_frames.bin
+	@echo "GIF saved: vga_output.gif"
+
+# Generate VGA GIF using slow cocotb simulation (fallback)
+gif-slow:
+	@echo "Step 1: Capturing VGA frames from simulation (slow)..."
+	cd test && uv run apio raw -- make MODULE=vga_capture
+	@echo "Step 2: Converting to animated GIF..."
+	cd test && uv run python make_gif.py
+	@mv test/vga_output.gif . 2>/dev/null || true
+	@rm -f test/vga_frames.bin
 	@echo "GIF saved: vga_output.gif"
 
 # =============================================================================

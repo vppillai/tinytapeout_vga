@@ -16,6 +16,9 @@ sim_build/
 *.out
 *.vvp
 results.xml
+obj_dir/
+vga_frames.bin
+vga_output.gif
 
 # Editor/IDE
 *.swp

@@ -2,24 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 """
-VGA Frame Capture - Generate GIF from VGA simulation output
+VGA Frame Capture - Dump raw pixel data from VGA simulation
 
-Captures VGA frames from cocotb simulation and generates an animated GIF.
-This provides visual validation of the VGA output.
+Captures VGA frames from cocotb simulation and saves raw pixel data.
+Run make_gif.py separately to convert to animated GIF.
 """
 
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles, RisingEdge
-import numpy as np
-
-try:
-    from PIL import Image
-    import imageio
-    HAS_IMAGING = True
-except ImportError:
-    HAS_IMAGING = False
-    print("Warning: PIL/imageio not installed. Install with: pip install pillow imageio")
+import struct
 
 # VGA 640x480 @ 60Hz timing constants
 H_DISPLAY = 640
@@ -68,10 +60,8 @@ async def wait_vsync_fall(dut):
         await RisingEdge(dut.clk)
 
 
-async def capture_frame(dut):
-    """Capture a single 640x480 frame"""
-    frame = np.zeros((V_DISPLAY, H_DISPLAY, 3), dtype=np.uint8)
-
+async def capture_frame(dut, frame_data):
+    """Capture a single 640x480 frame to byte array"""
     # Wait for VSYNC (start of frame)
     await wait_vsync_fall(dut)
 
@@ -96,23 +86,17 @@ async def capture_frame(dut):
         # Capture pixels
         for x in range(H_DISPLAY):
             r, g, b = get_rgb(dut)
-            frame[y, x] = [r, g, b]
+            frame_data.extend([r, g, b])
             await RisingEdge(dut.clk)
-
-    return frame
 
 
 @cocotb.test()
-async def capture_vga_gif(dut):
-    """Capture VGA frames and generate animated GIF"""
-
-    if not HAS_IMAGING:
-        dut._log.warning("Skipping GIF capture - PIL/imageio not installed")
-        return
+async def capture_vga_frames(dut):
+    """Capture VGA frames and save raw pixel data"""
 
     NUM_FRAMES = 30  # Number of frames to capture
     FRAME_SKIP = 2   # Skip frames between captures for faster animation
-    OUTPUT_FILE = "vga_output.gif"
+    OUTPUT_FILE = "vga_frames.bin"
 
     dut._log.info(f"Starting VGA capture: {NUM_FRAMES} frames")
 
@@ -128,24 +112,23 @@ async def capture_vga_gif(dut):
     dut.rst_n.value = 1
     await ClockCycles(dut.clk, 5)
 
-    frames = []
+    # Open output file
+    with open(OUTPUT_FILE, 'wb') as f:
+        # Write header: num_frames, width, height
+        f.write(struct.pack('<III', NUM_FRAMES, H_DISPLAY, V_DISPLAY))
 
-    for i in range(NUM_FRAMES):
-        dut._log.info(f"Capturing frame {i+1}/{NUM_FRAMES}")
+        for i in range(NUM_FRAMES):
+            dut._log.info(f"Capturing frame {i+1}/{NUM_FRAMES}")
 
-        frame = await capture_frame(dut)
-        frames.append(frame)
+            frame_data = bytearray()
+            await capture_frame(dut, frame_data)
+            f.write(frame_data)
 
-        # Skip frames for animation speed
-        for _ in range(FRAME_SKIP):
-            await wait_vsync_fall(dut)
-            while get_vsync(dut) == 0:
-                await RisingEdge(dut.clk)
+            # Skip frames for animation speed
+            for _ in range(FRAME_SKIP):
+                await wait_vsync_fall(dut)
+                while get_vsync(dut) == 0:
+                    await RisingEdge(dut.clk)
 
-    # Generate GIF
-    dut._log.info(f"Generating GIF: {OUTPUT_FILE}")
-
-    images = [Image.fromarray(f) for f in frames]
-    imageio.mimsave(OUTPUT_FILE, images, duration=100, loop=0)  # 100ms per frame, loop forever
-
-    dut._log.info(f"GIF saved: {OUTPUT_FILE}")
+    dut._log.info(f"Raw frames saved to: {OUTPUT_FILE}")
+    dut._log.info("Run 'make gif' to convert to animated GIF")
