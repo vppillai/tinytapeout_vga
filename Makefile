@@ -65,9 +65,10 @@ led-build:
 # =============================================================================
 
 # Run cocotb tests (TinyTapeout compatible)
+# Uses apio's oss-cad-suite for iverilog/vvp
 test:
 	@echo "Running cocotb tests..."
-	cd test && make
+	cd test && uv run apio raw -- make
 
 # =============================================================================
 # TinyTapeout Release

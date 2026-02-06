@@ -15,6 +15,7 @@ sim_build/
 *.vcd
 *.out
 *.vvp
+results.xml
 
 # Editor/IDE
 *.swp
