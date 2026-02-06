@@ -34,19 +34,19 @@ sync-common:
 # Build FPGA bitstream
 build: sync-common
 	@echo "Building VGA FPGA bitstream..."
-	uv run apio build
+	cd src && uv run apio build
 	@echo "Build complete!"
 
 # Flash to FPGA
 flash: build
 	@echo "Flashing VGA project to FPGA..."
-	uv run apio upload
+	cd src && uv run apio upload
 	@echo "Flash complete!"
 
 # Upload without rebuild
 upload:
 	@echo "Uploading to FPGA..."
-	uv run apio upload
+	cd src && uv run apio upload
 
 # =============================================================================
 # LED Test Targets
@@ -145,7 +145,7 @@ setup:
 # Clean FPGA build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
-	uv run apio clean
+	cd src && uv run apio clean
 	@rm -f src/pll_25mhz.v
 	$(MAKE) -C $(LED_TEST_DIR) clean
 	@echo "Clean complete!"
