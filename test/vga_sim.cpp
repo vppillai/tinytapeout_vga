@@ -98,9 +98,11 @@ int main(int argc, char** argv) {
             // Capture pixels
             for (int x = 0; x < H_DISPLAY; x++) {
                 uint8_t val = dut->uo_out;
-                uint8_t r = ((val >> 4) & 1) << 1 | ((val >> 0) & 1);
-                uint8_t g = ((val >> 5) & 1) << 1 | ((val >> 1) & 1);
-                uint8_t b = ((val >> 6) & 1) << 1 | ((val >> 2) & 1);
+                // uo_out = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]}
+                //            7      6     5     4      3      2     1     0
+                uint8_t r = ((val >> 0) & 1) << 1 | ((val >> 4) & 1);  // {r[1], r[0]}
+                uint8_t g = ((val >> 1) & 1) << 1 | ((val >> 5) & 1);  // {g[1], g[0]}
+                uint8_t b = ((val >> 2) & 1) << 1 | ((val >> 6) & 1);  // {b[1], b[0]}
 
                 frame_data.push_back(COLOR_MAP[r]);
                 frame_data.push_back(COLOR_MAP[g]);
