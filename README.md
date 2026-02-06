@@ -263,15 +263,24 @@ These are the same tests used in the TinyTapeout submission.
 
 ### Visual Validation
 
-Generate an animated GIF showing the VGA output:
+Generate animated GIFs showing the VGA output:
 
 ```bash
 make gif
 ```
 
-This uses Verilator for fast native simulation, capturing 540 consecutive frames (one full horizontal bounce cycle, ~9 seconds at 60Hz) and creates `vga_output.gif` showing the bouncing text animation with starfield background.
+This uses Verilator for fast native simulation, capturing 540 consecutive frames (one full horizontal bounce cycle, ~9 seconds at 60Hz) and creates two GIF files:
 
-**Note:** The GIF format specifies frame delays in centiseconds (1/100th second), so true 60fps (16.67ms/frame) cannot be represented exactly. Additionally, most browsers enforce a minimum delay of 20ms per frame. The generated GIF uses 17ms timing, but actual playback will be ~50fps depending on the viewer. The actual RTL runs at true 60Hz when deployed on hardware.
+| File | Description |
+|------|-------------|
+| `vga_output.gif` | Frame-accurate capture (all 540 frames @ 17ms) |
+| `vga_preview.gif` | Browser-compensated preview (real-time playback) |
+
+**GIF Framerate Note:** The GIF format specifies frame delays in centiseconds (1/100th second), and most browsers enforce a minimum delay of ~20ms per frame. This means `vga_output.gif` may play slower than real-time in browsers. The `vga_preview.gif` compensates by skipping frames, so it plays at the correct real-time speed despite browser limitations. The actual RTL runs at true 60Hz when deployed on hardware.
+
+**Preview (browser-compensated, real-time playback):**
+
+![VGA Preview](vga_preview.gif)
 
 ## Prerequisites
 

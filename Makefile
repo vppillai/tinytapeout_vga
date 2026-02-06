@@ -70,8 +70,8 @@ test:
 	@echo "Running cocotb tests..."
 	cd test && uv run apio raw -- make
 
-# Generate VGA output GIF from simulation (fast Verilator-based)
-# Captures 60 consecutive frames (1 second at 60Hz VGA)
+# Generate VGA output GIFs from simulation (fast Verilator-based)
+# Creates both frame-accurate and browser-compensated preview versions
 gif:
 	@echo "Building VGA simulator with Verilator..."
 	@mkdir -p test/obj_dir
@@ -81,11 +81,11 @@ gif:
 	cd test/obj_dir && make -f Vtt_um_embeddedinn_vga.mk
 	@echo "Capturing VGA frames..."
 	cd test && ./obj_dir/vga_sim
-	@echo "Converting to animated GIF..."
+	@echo "Converting to animated GIFs..."
 	cd test && uv run python make_gif.py
-	@mv test/vga_output.gif . 2>/dev/null || true
+	@mv test/vga_output.gif test/vga_preview.gif . 2>/dev/null || true
 	@rm -f test/vga_frames.bin
-	@echo "GIF saved: vga_output.gif"
+	@echo "GIFs saved: vga_output.gif (frame-accurate), vga_preview.gif (browser-compensated)"
 
 # =============================================================================
 # TinyTapeout Release

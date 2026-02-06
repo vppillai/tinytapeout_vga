@@ -90,9 +90,11 @@ jobs:
       - name: Generate VGA output GIF
         run: make gif
 
-      - name: Upload GIF artifact
+      - name: Upload GIF artifacts
         uses: actions/upload-artifact@v4
         with:
           name: vga-preview
-          path: vga_output.gif
+          path: |
+            vga_output.gif
+            vga_preview.gif
           overwrite: true
