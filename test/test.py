@@ -479,8 +479,8 @@ async def test_animation(dut):
             await RisingEdge(dut.clk)
             frame1_colors.append(get_rgb(dut))
 
-    # Wait 5 frames for movement (text moves 1 pixel/frame)
-    for _ in range(5):
+    # Wait 20 frames for more movement (text moves 1 pixel/frame)
+    for _ in range(20):
         await wait_vsync_fall(dut)
         while get_vsync(dut) == 0:
             await RisingEdge(dut.clk)
@@ -497,8 +497,8 @@ async def test_animation(dut):
     # Compare - check if any pixels changed
     color_changes = sum(1 for c1, c2 in zip(frame1_colors, frame2_colors) if c1 != c2)
 
-    assert color_changes > 0, "No animation detected - pixels identical after 5 frames"
-    dut._log.info(f"PASS: Animation detected - {color_changes}/{len(frame1_colors)} pixels changed after 5 frames")
+    assert color_changes > 0, "No animation detected - pixels identical after 20 frames"
+    dut._log.info(f"PASS: Animation detected - {color_changes}/{len(frame1_colors)} pixels changed after 20 frames")
 
 
 @cocotb.test()
@@ -537,7 +537,7 @@ async def test_reset_recovery(dut):
 
 @cocotb.test()
 async def test_consecutive_line_timing(dut):
-    """TEST 17: 20 consecutive lines have correct timing"""
+    """TEST 17: 50 consecutive lines have correct timing"""
     dut._log.info("TEST 17: Consecutive line timing")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
@@ -553,7 +553,7 @@ async def test_consecutive_line_timing(dut):
 
     line_errors = 0
 
-    for i in range(20):
+    for i in range(50):
         await wait_hsync_fall(dut)
         count = 0
 
@@ -575,4 +575,4 @@ async def test_consecutive_line_timing(dut):
             line_errors += 1
 
     assert line_errors == 0, f"{line_errors} lines with incorrect timing"
-    dut._log.info("PASS: 20 consecutive lines have correct timing")
+    dut._log.info("PASS: 50 consecutive lines have correct timing")
