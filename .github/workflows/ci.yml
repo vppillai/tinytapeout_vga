@@ -127,9 +127,24 @@ jobs:
       - name: Checkout source repo
         uses: actions/checkout@v4
         with:
+          fetch-depth: 2  # Need previous commit to detect changes
           path: vga_tt
 
+      - name: Check for TT-relevant changes
+        id: changes
+        run: |
+          cd vga_tt
+          # Check if any TT-relevant files changed in this push
+          if git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|test/(Makefile|tb\.v|test\.py))$'; then
+            echo "tt_changed=true" >> $GITHUB_OUTPUT
+            echo "TT-relevant files changed"
+          else
+            echo "tt_changed=false" >> $GITHUB_OUTPUT
+            echo "No TT-relevant files changed, skipping sync"
+          fi
+
       - name: Checkout TinyTapeout repo
+        if: steps.changes.outputs.tt_changed == 'true'
         uses: actions/checkout@v4
         with:
           repository: vppillai/tinytapeout-ihp-26a
@@ -137,6 +152,7 @@ jobs:
           path: tt-repo
 
       - name: Sync files to TT repo
+        if: steps.changes.outputs.tt_changed == 'true'
         run: |
           TT_PROJECT="tt-repo/projects/tt_um_embeddedinn_vga"
 
@@ -154,6 +170,7 @@ jobs:
           cp vga_tt/test/test.py "$TT_PROJECT/test/"
 
       - name: Commit and push to TT repo
+        if: steps.changes.outputs.tt_changed == 'true'
         run: |
           cd tt-repo
           git config user.name "github-actions[bot]"
