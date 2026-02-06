@@ -266,6 +266,35 @@ These are the same tests used in the TinyTapeout submission.
 - Python 3.11+
 - Docker (optional, for local TT hardening)
 
+### macOS
+
+```bash
+# Install uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install project dependencies and apio packages
+make setup
+```
+
+### Ubuntu
+
+```bash
+# Install uv (Python package manager)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Install libusb for FPGA programming (optional, for flashing)
+sudo apt-get update
+sudo apt-get install -y libusb-1.0-0-dev
+
+# Install project dependencies and apio packages
+make setup
+```
+
+### What `make setup` Does
+
+1. Installs Python dependencies via uv (apio, cocotb, pytest)
+2. Downloads apio packages (oss-cad-suite: yosys, nextpnr, iverilog, iceprog)
+
 ## License
 
 MIT
