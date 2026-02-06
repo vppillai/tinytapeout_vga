@@ -28,7 +28,7 @@ jobs:
         run: uv sync
 
       - name: Install apio packages
-        run: uv run apio packages --install oss-cad-suite
+        run: uv run apio packages update --force
 
       - name: Run cocotb tests
         run: make test
@@ -53,7 +53,7 @@ jobs:
         run: uv sync
 
       - name: Install apio packages
-        run: uv run apio packages --install oss-cad-suite
+        run: uv run apio packages update --force
 
       - name: Build FPGA bitstream
         run: make build

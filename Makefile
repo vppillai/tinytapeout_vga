@@ -121,8 +121,8 @@ tt-diff:
 # Setup development environment
 setup:
 	@echo "Setting up development environment..."
-	uv pip install apio cocotb
-	uv run apio packages --install --force oss-cad-suite
+	uv sync
+	uv run apio packages update --force
 	@echo "Setup complete!"
 
 # Clean FPGA build artifacts
