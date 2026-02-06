@@ -62,7 +62,8 @@ def main():
         save_all=True,
         append_images=frames[1:],
         duration=17,  # 17ms per frame (~60 fps, real-time)
-        loop=0  # Loop forever
+        loop=0,  # Loop forever
+        optimize=True  # Reduce file size
     )
 
     print(f"Done! GIF saved to: {output_file}")

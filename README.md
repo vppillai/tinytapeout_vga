@@ -271,6 +271,8 @@ make gif
 
 This uses Verilator for fast native simulation, capturing 540 consecutive frames (one full horizontal bounce cycle, ~9 seconds at 60Hz) and creates `vga_output.gif` showing the bouncing text animation with starfield background.
 
+**Note:** The GIF format specifies frame delays in centiseconds (1/100th second), so true 60fps (16.67ms/frame) cannot be represented exactly. Additionally, most browsers enforce a minimum delay of 20ms per frame. The generated GIF uses 17ms timing, but actual playback will be ~50fps depending on the viewer. The actual RTL runs at true 60Hz when deployed on hardware.
+
 ## Prerequisites
 
 - [uv](https://github.com/astral-sh/uv) - Python package manager
