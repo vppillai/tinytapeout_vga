@@ -63,7 +63,7 @@ jobs:
         with:
           name: fpga-bitstream
           path: _build/default/hardware.bin
-          retention-days: 7
+          overwrite: true
 
   gif:
     name: Generate VGA Preview
@@ -95,4 +95,4 @@ jobs:
         with:
           name: vga-preview
           path: vga_output.gif
-          retention-days: 30
+          overwrite: true
