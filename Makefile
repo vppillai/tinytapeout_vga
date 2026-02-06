@@ -17,7 +17,7 @@ TT_RELEASE_DIR = ../vga_tt_release
 COMMON_DIR = .fpga/common
 LED_TEST_DIR = .fpga/led_test
 
-.PHONY: all build flash clean test led-test tt-release tt-copy tt-verify tt-sync-tests tt-diff help sync-common
+.PHONY: all build flash clean sim test-cocotb led-test led-build tt-release tt-copy tt-diff help sync-common
 
 # =============================================================================
 # FPGA Targets (VGA Project)
@@ -70,47 +70,35 @@ sim: sync-common
 	uv run apio sim --no-gtkwave
 	@echo "Simulation complete!"
 
-# Run cocotb tests (requires test setup)
+# Run cocotb tests (TinyTapeout compatible)
 test-cocotb:
 	@echo "Running cocotb tests..."
-	cd $(TT_RELEASE_DIR)/test && make
+	cd test && make
 
 # =============================================================================
 # TinyTapeout Release
 # =============================================================================
 
 # Create TinyTapeout release package
+# This creates a directory structure that can be dropped directly into the TT shuttle repo
 tt-release: clean-release
 	@echo "Creating TinyTapeout release package..."
 	@mkdir -p $(TT_RELEASE_DIR)/src
 	@mkdir -p $(TT_RELEASE_DIR)/test
 	@# Copy core source (only vga_tt.v - not FPGA-specific files)
 	@cp src/vga_tt.v $(TT_RELEASE_DIR)/src/
-	@# Copy info.yaml from local src/ (preferred) or shuttle repo
-	@if [ -f "src/info.yaml" ]; then \
-		cp src/info.yaml $(TT_RELEASE_DIR)/; \
-		echo "Using local src/info.yaml"; \
-	elif [ -f "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" ]; then \
-		cp "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" $(TT_RELEASE_DIR)/; \
-		echo "Using info.yaml from shuttle repo"; \
-	else \
-		echo "ERROR: info.yaml not found in src/ or shuttle repo"; \
-		exit 1; \
-	fi
-	@# Copy cocotb tests from TT shuttle repo if exists
-	@if [ -d "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test" ]; then \
-		cp -r "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/"* $(TT_RELEASE_DIR)/test/; \
-		echo "Copied tests from shuttle repo"; \
-	else \
-		echo "Note: No tests found in shuttle repo (will need to add manually)"; \
-	fi
+	@# Copy info.yaml
+	@cp src/info.yaml $(TT_RELEASE_DIR)/
+	@# Copy TT-compatible tests
+	@cp test/Makefile test/tb.v test/test.py $(TT_RELEASE_DIR)/test/
 	@echo ""
 	@echo "TinyTapeout release created in: $(TT_RELEASE_DIR)/"
 	@echo "Contents:"
 	@ls -la $(TT_RELEASE_DIR)/
 	@ls -la $(TT_RELEASE_DIR)/src/
+	@ls -la $(TT_RELEASE_DIR)/test/
 	@echo ""
-	@echo "To submit: run 'make tt-copy' to copy to shuttle repo"
+	@echo "To submit: copy contents to TT shuttle repo project directory"
 
 # Copy release to TinyTapeout shuttle repo
 tt-copy: tt-release
@@ -118,41 +106,18 @@ tt-copy: tt-release
 	@mkdir -p "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src"
 	@mkdir -p "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test"
 	@cp $(TT_RELEASE_DIR)/src/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src/"
-	@cp $(TT_RELEASE_DIR)/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/" 2>/dev/null || true
-	@cp -r $(TT_RELEASE_DIR)/test/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/" 2>/dev/null || true
+	@cp $(TT_RELEASE_DIR)/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
+	@cp $(TT_RELEASE_DIR)/test/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/"
 	@echo "Copied to: $(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
-
-# Verify TinyTapeout submission structure
-tt-verify:
-	@echo "Verifying TinyTapeout submission structure..."
-	@echo ""
-	@echo "=== Source Files ==="
-	@ls -la "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src/" 2>/dev/null || echo "src/ not found"
-	@echo ""
-	@echo "=== info.yaml ==="
-	@cat "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" 2>/dev/null | head -20 || echo "info.yaml not found"
-	@echo ""
-	@echo "=== Test Files ==="
-	@ls -la "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/" 2>/dev/null || echo "test/ not found"
-
-# Sync tests from shuttle repo to local tt_release for local testing
-tt-sync-tests:
-	@echo "Syncing tests from shuttle repo..."
-	@mkdir -p $(TT_RELEASE_DIR)/test
-	@if [ -d "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test" ]; then \
-		cp -r "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/"* $(TT_RELEASE_DIR)/test/; \
-		echo "Tests synced to $(TT_RELEASE_DIR)/test/"; \
-	else \
-		echo "No tests found in shuttle repo"; \
-	fi
 
 # Show differences between local and shuttle repo
 tt-diff:
-	@echo "=== vga_tt.v differences ==="
-	@diff -u "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src/vga_tt.v" src/vga_tt.v 2>/dev/null || echo "(files differ or shuttle file not found)"
-	@echo ""
-	@echo "=== info.yaml differences ==="
-	@diff -u "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" src/info.yaml 2>/dev/null || echo "(files differ or shuttle file not found)"
+	@echo "=== vga_tt.v ==="
+	@diff -q src/vga_tt.v "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src/vga_tt.v" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
+	@echo "=== info.yaml ==="
+	@diff -q src/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
+	@echo "=== test/test.py ==="
+	@diff -q test/test.py "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/test.py" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 
 # =============================================================================
 # Setup & Clean
@@ -198,11 +163,9 @@ help:
 	@echo "  make test-cocotb - Run cocotb tests"
 	@echo ""
 	@echo "=== TinyTapeout Release ==="
-	@echo "  make tt-release     - Create TT release package in tt_release/"
-	@echo "  make tt-copy        - Copy release to TT shuttle repo"
-	@echo "  make tt-verify      - Verify TT submission structure"
-	@echo "  make tt-sync-tests  - Sync tests from shuttle repo to local"
-	@echo "  make tt-diff        - Show differences with shuttle repo"
+	@echo "  make tt-release  - Create TT release package (ready to drop into shuttle repo)"
+	@echo "  make tt-copy     - Copy release to TT shuttle repo"
+	@echo "  make tt-diff     - Compare local files with shuttle repo"
 	@echo ""
 	@echo "=== Setup & Clean ==="
 	@echo "  make setup       - Install development dependencies"

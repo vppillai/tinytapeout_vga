@@ -18,16 +18,16 @@ vga_tt/
 │   ├── vga_tt.v           # Core TinyTapeout module (for submission)
 │   ├── fpga_top.v         # FPGA wrapper (uses PLL)
 │   └── info.yaml          # TinyTapeout project metadata
-├── test/
-│   └── vga_tt_tb.v        # Verilog testbench (17 VGA verification tests)
+├── test/                  # TinyTapeout compatible tests (cocotb)
+│   ├── Makefile
+│   ├── tb.v
+│   └── test.py
 ├── .fpga/                 # FPGA tools (dot-prefix hides from apio)
 │   ├── common/
 │   │   └── pll_25mhz.v    # Shared PLL module (12MHz → 25.175MHz)
-│   └── led_test/          # LED test for PLL verification
-│       ├── led_test.v
-│       ├── led_test.pcf
-│       ├── apio.ini
-│       └── Makefile
+│   ├── led_test/          # LED test for PLL verification
+│   └── sim/
+│       └── vga_tt_tb.v    # Verilog testbench (17 tests, for apio sim)
 ├── vga_tt.pcf             # FPGA pin constraints (TinyVGA PMOD)
 ├── apio.ini               # Apio project configuration
 ├── Makefile               # Build automation
@@ -75,17 +75,15 @@ make led-test
 ### Testing
 | Target | Description |
 |--------|-------------|
-| `make sim` | Run Verilog simulation |
-| `make test-cocotb` | Run cocotb tests |
+| `make sim` | Run Verilog simulation (17 VGA timing tests) |
+| `make test-cocotb` | Run TinyTapeout cocotb tests |
 
 ### TinyTapeout Release
 | Target | Description |
 |--------|-------------|
-| `make tt-release` | Create TT release package in `../vga_tt_release/` |
+| `make tt-release` | Create TT release package (ready to drop into shuttle repo) |
 | `make tt-copy` | Copy release to TT shuttle repo |
-| `make tt-verify` | Verify TT submission structure |
-| `make tt-sync-tests` | Sync tests from shuttle repo to local |
-| `make tt-diff` | Show differences with shuttle repo |
+| `make tt-diff` | Compare local files with shuttle repo |
 
 ### Setup & Clean
 | Target | Description |
@@ -136,8 +134,10 @@ make tt-release
 
 This creates `../vga_tt_release/` with:
 - `src/vga_tt.v` - Core module for submission
-- `info.yaml` - Project metadata (from `src/info.yaml`)
-- `test/` - Cocotb tests (from shuttle repo)
+- `info.yaml` - Project metadata
+- `test/` - Cocotb tests (Makefile, tb.v, test.py)
+
+The release package can be dropped directly into the TinyTapeout shuttle repo.
 
 ### Copy to Shuttle Repo
 
@@ -155,14 +155,6 @@ make tt-verify
 make tt-diff
 ```
 
-### Sync Tests from Shuttle Repo
-
-If tests are updated in the shuttle repo, sync them locally:
-
-```bash
-make tt-sync-tests
-make test-cocotb
-```
 
 ## Architecture
 
@@ -266,21 +258,25 @@ This is the **single source of truth** for PLL configuration. Both the VGA proje
 
 ## Verification
 
-### Verilog Testbench
+### Verilog Simulation (FPGA Testing)
 
-17 comprehensive tests for VGA 640x480 @ 60Hz:
+17 comprehensive VGA timing tests using apio/iverilog:
 
 ```bash
 make sim
 ```
 
+Tests verify: sync timing, blanking, color output, animation, reset behavior.
+
 ### Cocotb Tests (TinyTapeout)
 
-15 Python-based tests for TinyTapeout submission:
+TinyTapeout compatible tests in `test/` directory:
 
 ```bash
 make test-cocotb
 ```
+
+These are the same tests used in the TinyTapeout submission.
 
 ## Prerequisites
 
