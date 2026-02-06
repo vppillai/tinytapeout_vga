@@ -21,7 +21,9 @@ const int V_BACK = 33;
 const int V_TOTAL = 525;
 
 // Configuration
-const int NUM_FRAMES = 60;  // Capture 60 consecutive frames (1 second at 60Hz)
+// Full X-axis bounce cycle: 100→280 (180) + 280→10 (270) + 10→100 (90) = 540 frames
+// This captures complete left-right bouncing motion (~9 seconds at 60Hz)
+const int NUM_FRAMES = 540;
 const int FRAME_SKIP = 0;   // No skipping - capture every frame
 
 // 2-bit to 8-bit color mapping
