@@ -180,7 +180,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -A
-          if git diff --staged --quiet; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger: always commit (even if no changes)
+            git commit --allow-empty -m "Sync from vga_tt repo (manual)"
+            git push
+            echo "Forced sync complete"
+          elif git diff --staged --quiet; then
             echo "No changes to sync"
           else
             git commit -m "Sync from vga_tt repo"
