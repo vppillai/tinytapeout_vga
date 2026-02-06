@@ -5,10 +5,10 @@
 // Uses shared PLL for 25.175 MHz clock generation
 
 module fpga_top(
-    input  wire CLK,          // 12 MHz Crystal on the FPGA board
-    input  wire BTN_N,        // Reset Button (directly active low)
+    input  wire CLK,          // 12 MHz crystal
+    input  wire BTN_N,        // Reset button (active low)
 
-    // VGA Output Pins (directly active high PMOD connector)
+    // VGA Output Pins (directly mapped to TinyVGA PMOD)
     output wire VGA_HSYNC,
     output wire VGA_VSYNC,
     output wire [1:0] VGA_R,
@@ -31,7 +31,7 @@ module fpga_top(
 
     // TinyTapeout module interface
     wire [7:0] uo_out;
-    wire [7:0] ui_in = 8'b0;   // Directly active low unused inputs
+    wire [7:0] ui_in = 8'b0;   // Unused inputs tied low
     wire [7:0] uio_in = 8'b0;
 
     // Reset: TinyTapeout uses active-low reset (rst_n)

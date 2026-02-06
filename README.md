@@ -119,9 +119,9 @@ make flash
 
 1. **Develop locally** - Edit `src/vga_tt.v` and `src/info.yaml`
 2. **Test on FPGA** - Use `make flash` to verify on hardware
-3. **Create release** - Use `make tt-release` to package for TT
-4. **Copy to shuttle** - Use `make tt-copy` to sync with shuttle repo
-5. **Run TT tests** - Use `make test-cocotb` to verify cocotb tests pass
+3. **Run tests** - Use `make test` to verify cocotb tests pass
+4. **Create release** - Use `make tt-release` to package for TT
+5. **Copy to shuttle** - Use `make tt-copy` to sync with shuttle repo
 
 ### Create Release Package
 
@@ -144,9 +144,6 @@ export TT_SHUTTLE_REPO=/path/to/shuttle/repo
 
 # Copy files to shuttle repo
 make tt-copy
-
-# Verify structure
-make tt-verify
 
 # Check for differences
 make tt-diff

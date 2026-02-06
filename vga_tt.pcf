@@ -21,7 +21,7 @@ set_io LED_ACTIVE 95  # Green LED (D5) - ON when PLL is locked
 # TINY VGA PMOD (mole99) - iCEstick J2 Header
 # =============================================================================
 #
-# TinyVGA PMOD Pinout (accent standard PMOD accent):
+# TinyVGA PMOD Pinout (standard PMOD):
 #   Top Row:    [1:R1] [2:G1] [3:B1] [4:VS] [5:GND] [6:VCC]
 #   Bottom Row: [7:R0] [8:G0] [9:B0] [10:HS] [11:GND] [12:VCC]
 #
