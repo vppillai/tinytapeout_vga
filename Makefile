@@ -70,6 +70,14 @@ test:
 	@echo "Running cocotb tests..."
 	cd test && uv run apio raw -- make
 
+# Generate VGA output GIF from simulation
+# Captures frames and creates animated GIF for visual validation
+gif:
+	@echo "Generating VGA output GIF..."
+	cd test && uv run apio raw -- make MODULE=vga_capture
+	@mv test/vga_output.gif . 2>/dev/null || true
+	@echo "GIF saved: vga_output.gif"
+
 # =============================================================================
 # TinyTapeout Release
 # =============================================================================

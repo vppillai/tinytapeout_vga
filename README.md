@@ -74,6 +74,7 @@ make led-test
 | Target | Description |
 |--------|-------------|
 | `make test` | Run cocotb tests (TinyTapeout compatible) |
+| `make gif` | Generate animated GIF from VGA simulation output |
 
 ### TinyTapeout Release
 | Target | Description |
@@ -259,6 +260,16 @@ make test
 ```
 
 These are the same tests used in the TinyTapeout submission.
+
+### Visual Validation
+
+Generate an animated GIF showing the VGA output:
+
+```bash
+make gif
+```
+
+This captures 30 frames from the simulation and creates `vga_output.gif` showing the bouncing text animation with starfield background.
 
 ## Prerequisites
 
