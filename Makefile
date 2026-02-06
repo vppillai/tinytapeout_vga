@@ -2,23 +2,20 @@
 # Bouncing "EMBEDDEDINN" text with parallax starfield
 #
 # Project structure:
-#   vga_tt/              - This project (clean apio project)
-#     src/               - Core TinyTapeout module + FPGA wrapper
-#     test/              - Verilog testbench
-#   ../vga_fpga/         - Sibling directory for FPGA tools
-#   ../vga_tt_release/   - TinyTapeout submission package (generated)
-#     common/            - Shared components (PLL) - single source of truth
-#     led_test/          - LED test for PLL verification
+#   src/               - Core TinyTapeout module + FPGA wrapper
+#   test/              - Verilog testbench
+#   .fpga/             - FPGA tools (dot-prefix hides from apio scanning)
+#     common/          - Shared components (PLL) - single source of truth
+#     led_test/        - LED test for PLL verification
 #
-# The sibling directory structure keeps the main project clean for apio.
-# Shared files are synced before each build.
+# Shared PLL is synced to src/ and led_test/ before each build.
 
 # Paths
 TT_SHUTTLE_REPO ?= ../tinytapeout-ihp-26a
 TT_PROJECT_NAME = tt_um_embeddedinn_vga
 TT_RELEASE_DIR = ../vga_tt_release
-COMMON_DIR = ../vga_fpga/common
-LED_TEST_DIR = ../vga_fpga/led_test
+COMMON_DIR = .fpga/common
+LED_TEST_DIR = .fpga/led_test
 
 .PHONY: all build flash clean test led-test tt-release tt-copy tt-verify tt-sync-tests tt-diff help sync-common
 

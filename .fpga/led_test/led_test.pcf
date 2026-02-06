@@ -1,0 +1,10 @@
+# Clock & Reset - Same as VGA project
+set_io CLK   21
+set_io BTN_N 44
+
+# iCEstick Onboard LEDs (active high)
+set_io LED[0] 99
+set_io LED[1] 98
+set_io LED[2] 97
+set_io LED[3] 96
+set_io LED[4] 95

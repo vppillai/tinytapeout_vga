@@ -13,31 +13,25 @@ Bouncing "EMBEDDEDINN" text with parallax starfield background, designed for [Ti
 ## Project Structure
 
 ```
-vga_tt/                    # Main TinyTapeout project (clean apio project)
+vga_tt/
 ├── src/
 │   ├── vga_tt.v           # Core TinyTapeout module (for submission)
 │   ├── fpga_top.v         # FPGA wrapper (uses PLL)
 │   └── info.yaml          # TinyTapeout project metadata
 ├── test/
 │   └── vga_tt_tb.v        # Verilog testbench (17 VGA verification tests)
+├── .fpga/                 # FPGA tools (dot-prefix hides from apio)
+│   ├── common/
+│   │   └── pll_25mhz.v    # Shared PLL module (12MHz → 25.175MHz)
+│   └── led_test/          # LED test for PLL verification
+│       ├── led_test.v
+│       ├── led_test.pcf
+│       ├── apio.ini
+│       └── Makefile
 ├── vga_tt.pcf             # FPGA pin constraints (TinyVGA PMOD)
 ├── apio.ini               # Apio project configuration
 ├── Makefile               # Build automation
 └── README.md
-
-../vga_fpga/               # Sibling directory for FPGA tools
-├── common/
-│   └── pll_25mhz.v        # Shared PLL module (12MHz → 25.175MHz)
-└── led_test/              # LED test for PLL verification
-    ├── led_test.v
-    ├── led_test.pcf
-    ├── apio.ini
-    └── Makefile
-
-../vga_tt_release/         # TinyTapeout submission package (generated)
-├── src/vga_tt.v           # Core module only
-├── info.yaml              # Project metadata
-└── test/                  # Cocotb tests from shuttle repo
 ```
 
 ### File Separation
@@ -49,11 +43,11 @@ The project maintains a clear separation between TinyTapeout submission files an
 | `src/vga_tt.v` | Core VGA design | Yes |
 | `src/info.yaml` | Project metadata | Yes |
 | `src/fpga_top.v` | FPGA wrapper with PLL | No |
-| `../vga_fpga/common/pll_25mhz.v` | iCE40 PLL configuration | No |
+| `.fpga/common/pll_25mhz.v` | iCE40 PLL configuration | No |
 
 ### Shared Components
 
-The `../vga_fpga/common/` directory contains components shared between the VGA project and LED test. Keeping this in a sibling directory prevents apio from scanning it during builds. Components are synced to their respective build locations via `make sync-common`.
+The `.fpga/common/` directory contains components shared between the VGA project and LED test. The dot-prefix prevents apio from scanning this directory during builds. Components are synced to their respective build locations via `make sync-common`.
 
 ## Quick Start
 
@@ -263,7 +257,7 @@ Reference: [TinyVGA PMOD by mole99](https://github.com/mole99/tiny-vga)
 
 ## PLL Module
 
-The `../vga_fpga/common/pll_25mhz.v` module provides clock generation for iCE40:
+The `.fpga/common/pll_25mhz.v` module provides clock generation for iCE40:
 - Input: 12 MHz crystal
 - Output: ~25.175 MHz (VGA pixel clock)
 - Lock indicator output

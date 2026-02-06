@@ -20,9 +20,10 @@ sim_build/
 *.swp
 *~
 .DS_Store
-# Auto-synced files from ../vga_fpga/common/
+# Auto-synced PLL files (from .fpga/common/)
 src/pll_25mhz.v
+.fpga/led_test/pll_25mhz.v
 
 # Build artifacts
 _build/
-tt_release/
+.fpga/led_test/_build/
