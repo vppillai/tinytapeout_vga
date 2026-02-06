@@ -64,3 +64,35 @@ jobs:
           name: fpga-bitstream
           path: _build/default/hardware.bin
           retention-days: 7
+
+  gif:
+    name: Generate VGA Preview
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Install apio packages
+        run: uv run apio packages update --force
+
+      - name: Generate VGA output GIF
+        run: make gif
+
+      - name: Upload GIF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vga-preview
+          path: vga_output.gif
+          retention-days: 30

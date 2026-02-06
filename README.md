@@ -269,7 +269,7 @@ Generate an animated GIF showing the VGA output:
 make gif
 ```
 
-This captures 30 frames from the simulation and creates `vga_output.gif` showing the bouncing text animation with starfield background.
+This uses Verilator for fast native simulation, capturing 60 consecutive frames (1 second at 60Hz) and creates `vga_output.gif` showing the bouncing text animation with starfield background.
 
 ## Prerequisites
 
