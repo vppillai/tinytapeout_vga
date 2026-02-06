@@ -121,7 +121,7 @@ jobs:
     name: Sync to TinyTapeout Repo
     runs-on: ubuntu-latest
     needs: [test, build]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout source repo
@@ -134,8 +134,12 @@ jobs:
         id: changes
         run: |
           cd vga_tt
+          # Force sync on manual trigger (workflow_dispatch)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "tt_changed=true" >> $GITHUB_OUTPUT
+            echo "Manual trigger - forcing sync"
           # Check if any TT-relevant files changed in this push
-          if git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|test/(Makefile|tb\.v|test\.py))$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|test/(Makefile|tb\.v|test\.py))$'; then
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "TT-relevant files changed"
           else
