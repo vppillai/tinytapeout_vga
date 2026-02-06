@@ -68,10 +68,16 @@ jobs:
   gif:
     name: Generate VGA Preview
     runs-on: ubuntu-latest
+    needs: [test, build]  # Only run after tests and build pass
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -89,6 +95,18 @@ jobs:
 
       - name: Generate VGA output GIF
         run: make gif
+
+      - name: Commit and push GIF if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add vga_preview.gif
+          if git diff --staged --quiet; then
+            echo "No changes to GIF"
+          else
+            git commit -m "Update VGA preview GIF [skip ci]"
+            git push
+          fi
 
       - name: Upload GIF artifacts
         uses: actions/upload-artifact@v4

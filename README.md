@@ -1,5 +1,7 @@
 # VGA Bouncing Text for TinyTapeout
 
+![VGA Preview](vga_preview.gif)
+
 Bouncing "EMBEDDEDINN" text with parallax starfield background, designed for [TinyTapeout](https://tinytapeout.com/). Generates 640x480 @ 60Hz VGA output with animated text rendered using procedural gate-logic (no ROM).
 
 ## Features
@@ -277,10 +279,6 @@ This uses Verilator for fast native simulation, capturing 540 consecutive frames
 | `vga_preview.gif` | Browser-compensated preview (real-time playback) |
 
 **GIF Framerate Note:** The GIF format specifies frame delays in centiseconds (1/100th second), and most browsers enforce a minimum delay of ~20ms per frame. This means `vga_output.gif` may play slower than real-time in browsers. The `vga_preview.gif` compensates by skipping frames, so it plays at the correct real-time speed despite browser limitations. The actual RTL runs at true 60Hz when deployed on hardware.
-
-**Preview (browser-compensated, real-time playback):**
-
-![VGA Preview](vga_preview.gif)
 
 ## Prerequisites
 
