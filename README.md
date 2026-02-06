@@ -20,7 +20,6 @@ vga_tt/
 │   ├── vga_tt.v           # Core TinyTapeout module (for submission)
 │   ├── fpga_top.v         # FPGA wrapper (uses PLL)
 │   ├── info.yaml          # TinyTapeout project metadata
-│   ├── apio.ini           # Apio project configuration
 │   └── vga_tt.pcf         # FPGA pin constraints (TinyVGA PMOD)
 ├── test/                  # TinyTapeout cocotb tests
 │   ├── Makefile
@@ -30,6 +29,7 @@ vga_tt/
 │   ├── common/
 │   │   └── pll_25mhz.v    # Shared PLL module (12MHz → 25.175MHz)
 │   └── led_test/          # LED test for PLL verification
+├── apio.ini               # Apio project configuration
 ├── Makefile               # Build automation
 └── README.md
 ```
