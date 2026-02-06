@@ -56,11 +56,12 @@ def main():
     print(f"Creating GIF: {output_file}...")
 
     # Save as animated GIF
+    # VGA runs at 60Hz, so ~17ms per frame (1000/60 = 16.67ms)
     frames[0].save(
         output_file,
         save_all=True,
         append_images=frames[1:],
-        duration=100,  # 100ms per frame (10 fps)
+        duration=17,  # 17ms per frame (~60 fps, real-time)
         loop=0  # Loop forever
     )
 
