@@ -129,22 +129,20 @@ endmodule
 // VGA TIMING GENERATOR (640x480 @ 60Hz)
 // =========================================================================
 module hvsync_generator(
-    input clk,
-    input reset,
+    input wire clk,
+    input wire reset,
     output reg hsync,
     output reg vsync,
     output reg display_on,
     output reg [9:0] hpos,
     output reg [9:0] vpos
 );
-  localparam H_DISPLAY = 640;
-  localparam H_BACK    = 48;
-  localparam H_FRONT   = 16;
-  localparam H_SYNC    = 96;
-  localparam V_DISPLAY = 480;
-  localparam V_BACK    = 33;
-  localparam V_FRONT   = 10;
-  localparam V_SYNC    = 2;
+  localparam [9:0] H_DISPLAY = 640;
+  localparam [9:0] H_FRONT   = 16;
+  localparam [9:0] H_SYNC    = 96;
+  localparam [9:0] V_DISPLAY = 480;
+  localparam [9:0] V_FRONT   = 10;
+  localparam [9:0] V_SYNC    = 2;
 
   always @(posedge clk or posedge reset) begin
     if (reset) begin
