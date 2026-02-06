@@ -6,7 +6,7 @@
 
 module led_test_top(
     input  wire CLK,      // 12 MHz Crystal on the FPGA board
-    input  wire BTN_N,    // Reset Button (directly active low directly active lowused)
+    input  wire BTN_N,    // Reset Button (active low, directly active low unused)
     output wire [4:0] LED // 5 onboard LEDs (LED[4] is green, others red)
 );
 

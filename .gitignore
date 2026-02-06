@@ -20,6 +20,8 @@ sim_build/
 *.swp
 *~
 .DS_Store
+.chipagents/
+.claude/
 # Auto-synced PLL files (from .fpga/common/)
 src/pll_25mhz.v
 .fpga/led_test/pll_25mhz.v

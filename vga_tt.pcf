@@ -9,7 +9,7 @@
 set_io CLK   21    # 12 MHz Crystal
 
 # Reset mapped to unused pin 44
-# Active low - directly active low to 3.3V briefly to reset (optional - design auto-starts)
+# Active low - bridge to GND briefly to reset (optional - design auto-starts)
 set_io BTN_N 44
 
 # =============================================================================
