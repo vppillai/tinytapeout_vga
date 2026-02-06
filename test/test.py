@@ -46,11 +46,15 @@ def get_vsync(dut):
 
 
 def get_rgb(dut):
-    """Get RGB values from uo_out"""
+    """Get RGB values from uo_out
+
+    uo_out = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]}
+               7      6     5     4      3      2     1     0
+    """
     val = int(dut.uo_out.value)
-    r = ((val >> 4) & 1) << 1 | ((val >> 0) & 1)
-    g = ((val >> 5) & 1) << 1 | ((val >> 1) & 1)
-    b = ((val >> 6) & 1) << 1 | ((val >> 2) & 1)
+    r = ((val >> 0) & 1) << 1 | ((val >> 4) & 1)  # {r[1], r[0]}
+    g = ((val >> 1) & 1) << 1 | ((val >> 5) & 1)  # {g[1], g[0]}
+    b = ((val >> 2) & 1) << 1 | ((val >> 6) & 1)  # {b[1], b[0]}
     return r, g, b
 
 
