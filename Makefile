@@ -17,7 +17,7 @@ TT_RELEASE_DIR = ../vga_tt_release
 COMMON_DIR = .fpga/common
 LED_TEST_DIR = .fpga/led_test
 
-.PHONY: all build flash clean sim test-cocotb led-test led-build tt-release tt-copy tt-diff help sync-common
+.PHONY: all build flash clean test led-test led-build tt-release tt-copy tt-diff help sync-common
 
 # =============================================================================
 # FPGA Targets (VGA Project)
@@ -64,14 +64,8 @@ led-build:
 # Testing
 # =============================================================================
 
-# Run Verilog simulation
-sim: sync-common
-	@echo "Running Verilog simulation..."
-	uv run apio sim --no-gtkwave
-	@echo "Simulation complete!"
-
 # Run cocotb tests (TinyTapeout compatible)
-test-cocotb:
+test:
 	@echo "Running cocotb tests..."
 	cd test && make
 
@@ -159,8 +153,7 @@ help:
 	@echo "  make led-test    - Build and flash LED test (PLL verification)"
 	@echo ""
 	@echo "=== Testing ==="
-	@echo "  make sim         - Run Verilog simulation"
-	@echo "  make test-cocotb - Run cocotb tests"
+	@echo "  make test        - Run cocotb tests"
 	@echo ""
 	@echo "=== TinyTapeout Release ==="
 	@echo "  make tt-release  - Create TT release package (ready to drop into shuttle repo)"

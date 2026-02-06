@@ -18,16 +18,14 @@ vga_tt/
 │   ├── vga_tt.v           # Core TinyTapeout module (for submission)
 │   ├── fpga_top.v         # FPGA wrapper (uses PLL)
 │   └── info.yaml          # TinyTapeout project metadata
-├── test/                  # TinyTapeout compatible tests (cocotb)
+├── test/                  # TinyTapeout cocotb tests
 │   ├── Makefile
 │   ├── tb.v
 │   └── test.py
 ├── .fpga/                 # FPGA tools (dot-prefix hides from apio)
 │   ├── common/
 │   │   └── pll_25mhz.v    # Shared PLL module (12MHz → 25.175MHz)
-│   ├── led_test/          # LED test for PLL verification
-│   └── sim/
-│       └── vga_tt_tb.v    # Verilog testbench (17 tests, for apio sim)
+│   └── led_test/          # LED test for PLL verification
 ├── vga_tt.pcf             # FPGA pin constraints (TinyVGA PMOD)
 ├── apio.ini               # Apio project configuration
 ├── Makefile               # Build automation
@@ -75,8 +73,7 @@ make led-test
 ### Testing
 | Target | Description |
 |--------|-------------|
-| `make sim` | Run Verilog simulation (17 VGA timing tests) |
-| `make test-cocotb` | Run TinyTapeout cocotb tests |
+| `make test` | Run cocotb tests (TinyTapeout compatible) |
 
 ### TinyTapeout Release
 | Target | Description |
@@ -258,22 +255,10 @@ This is the **single source of truth** for PLL configuration. Both the VGA proje
 
 ## Verification
 
-### Verilog Simulation (FPGA Testing)
-
-17 comprehensive VGA timing tests using apio/iverilog:
+TinyTapeout compatible cocotb tests in `test/` directory:
 
 ```bash
-make sim
-```
-
-Tests verify: sync timing, blanking, color output, animation, reset behavior.
-
-### Cocotb Tests (TinyTapeout)
-
-TinyTapeout compatible tests in `test/` directory:
-
-```bash
-make test-cocotb
+make test
 ```
 
 These are the same tests used in the TinyTapeout submission.
