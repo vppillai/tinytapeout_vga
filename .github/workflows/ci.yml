@@ -139,7 +139,7 @@ jobs:
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing sync"
           # Check if any TT-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py))$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md))$'; then
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "TT-relevant files changed"
           else
@@ -172,6 +172,7 @@ jobs:
           cp vga_tt/test/Makefile "$TT_PROJECT/test/"
           cp vga_tt/test/tb.v "$TT_PROJECT/test/"
           cp vga_tt/test/test.py "$TT_PROJECT/test/"
+          cp vga_tt/test/README.md "$TT_PROJECT/test/"
 
       - name: Commit and push to TT repo
         if: steps.changes.outputs.tt_changed == 'true'
@@ -214,7 +215,7 @@ jobs:
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing submission sync"
           # Check if any submission-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py))$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md))$'; then
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Submission-relevant files changed"
           else
@@ -248,6 +249,7 @@ jobs:
           cp vga_tt/test/Makefile submission-repo/test/
           cp vga_tt/test/tb.v submission-repo/test/
           cp vga_tt/test/test.py submission-repo/test/
+          cp vga_tt/test/README.md submission-repo/test/
 
           # Copy documentation
           cp vga_tt/docs/info.md submission-repo/docs/

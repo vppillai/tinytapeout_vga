@@ -158,6 +158,7 @@ tt-vga-submission/
 │   └── vga_tt.v          ← from src/vga_tt.v
 ├── test/
 │   ├── Makefile          ← from test/Makefile
+│   ├── README.md         ← from test/README.md
 │   ├── tb.v              ← from test/tb.v
 │   └── test.py           ← from test/test.py
 └── docs/

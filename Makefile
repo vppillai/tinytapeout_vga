@@ -103,7 +103,7 @@ tt-release: clean-release
 	@# Copy info.yaml
 	@cp src/info.yaml $(TT_RELEASE_DIR)/
 	@# Copy TT-compatible tests
-	@cp test/Makefile test/tb.v test/test.py $(TT_RELEASE_DIR)/test/
+	@cp test/Makefile test/tb.v test/test.py test/README.md $(TT_RELEASE_DIR)/test/
 	@# Copy documentation
 	@cp docs/info.md $(TT_RELEASE_DIR)/docs/
 	@cp docs/README.md $(TT_RELEASE_DIR)/
@@ -142,6 +142,8 @@ tt-diff:
 	@diff -q docs/README.md "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/README.md" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 	@echo "=== test/test.py ==="
 	@diff -q test/test.py "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/test.py" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
+	@echo "=== test/README.md ==="
+	@diff -q test/README.md "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/README.md" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 
 # =============================================================================
 # Setup & Clean
