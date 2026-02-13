@@ -227,7 +227,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: vppillai/tt-vga-submission
-          token: ${{ secrets.TT_SUBMISSION_TOKEN }}
+          token: ${{ secrets.TT_REPO_TOKEN }}
           path: submission-repo
 
       - name: Sync files to submission template

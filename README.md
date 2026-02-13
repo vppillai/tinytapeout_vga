@@ -148,12 +148,13 @@ Manual sync can be triggered from GitHub Actions → CI workflow → "Run workfl
 
 ### Required GitHub Secrets
 
-For the GitHub Actions workflow to push to the TinyTapeout repos, add these secrets to your repository:
+For the GitHub Actions workflow to push to the TinyTapeout repos, add this secret to your repository:
 
-1. **`TT_REPO_TOKEN`** - Personal Access Token with `repo` scope for pushing to `vppillai/tinytapeout-ihp-26a`
-2. **`TT_SUBMISSION_TOKEN`** - Personal Access Token with `repo` scope for pushing to `vppillai/tt-vga-submission`
+1. **`TT_REPO_TOKEN`** - Personal Access Token with `repo` scope for pushing to both:
+   - `vppillai/tinytapeout-ihp-26a` (full shuttle repo)
+   - `vppillai/tt-vga-submission` (submission template)
 
-To create tokens:
+To create the token:
 1. GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
 2. Generate new token with `repo` scope
 3. Add to repository: Settings → Secrets and variables → Actions → New repository secret
