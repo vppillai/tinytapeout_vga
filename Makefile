@@ -97,18 +97,22 @@ tt-release: clean-release
 	@echo "Creating TinyTapeout release package..."
 	@mkdir -p $(TT_RELEASE_DIR)/src
 	@mkdir -p $(TT_RELEASE_DIR)/test
+	@mkdir -p $(TT_RELEASE_DIR)/docs
 	@# Copy core source (only vga_tt.v - not FPGA-specific files)
 	@cp src/vga_tt.v $(TT_RELEASE_DIR)/src/
 	@# Copy info.yaml
 	@cp src/info.yaml $(TT_RELEASE_DIR)/
 	@# Copy TT-compatible tests
 	@cp test/Makefile test/tb.v test/test.py $(TT_RELEASE_DIR)/test/
+	@# Copy documentation
+	@cp docs/info.md $(TT_RELEASE_DIR)/docs/
 	@echo ""
 	@echo "TinyTapeout release created in: $(TT_RELEASE_DIR)/"
 	@echo "Contents:"
 	@ls -la $(TT_RELEASE_DIR)/
 	@ls -la $(TT_RELEASE_DIR)/src/
 	@ls -la $(TT_RELEASE_DIR)/test/
+	@ls -la $(TT_RELEASE_DIR)/docs/
 	@echo ""
 	@echo "To submit: copy contents to TT shuttle repo project directory"
 
@@ -117,9 +121,11 @@ tt-copy: tt-release
 	@echo "Copying to TinyTapeout shuttle repo..."
 	@mkdir -p "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src"
 	@mkdir -p "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test"
+	@mkdir -p "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/docs"
 	@cp $(TT_RELEASE_DIR)/src/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src/"
 	@cp $(TT_RELEASE_DIR)/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
 	@cp $(TT_RELEASE_DIR)/test/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/"
+	@cp $(TT_RELEASE_DIR)/docs/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/docs/"
 	@echo "Copied to: $(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
 
 # Show differences between local and shuttle repo
@@ -128,6 +134,8 @@ tt-diff:
 	@diff -q src/vga_tt.v "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/src/vga_tt.v" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 	@echo "=== info.yaml ==="
 	@diff -q src/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
+	@echo "=== docs/info.md ==="
+	@diff -q docs/info.md "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/docs/info.md" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 	@echo "=== test/test.py ==="
 	@diff -q test/test.py "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/test.py" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 

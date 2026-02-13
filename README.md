@@ -25,10 +25,14 @@ vga_tt/
 │   ├── Makefile
 │   ├── tb.v
 │   └── test.py
+├── docs/
+│   └── info.md            # Project documentation (for TT submission)
 ├── .fpga/                 # FPGA tools (dot-prefix hides from apio)
 │   ├── common/
 │   │   └── pll_25mhz.v    # Shared PLL module (12MHz → 25.175MHz)
 │   └── led_test/          # LED test for PLL verification
+├── .github/workflows/
+│   └── ci.yml             # GitHub Actions (test, build, sync to TT repos)
 ├── apio.ini               # Apio project configuration
 ├── Makefile               # Build automation
 └── README.md
@@ -42,6 +46,8 @@ The project maintains a clear separation between TinyTapeout submission files an
 |------|---------|-----------------|
 | `src/vga_tt.v` | Core VGA design | Yes |
 | `src/info.yaml` | Project metadata | Yes |
+| `docs/info.md` | Project documentation | Yes |
+| `test/*.{v,py}` | Cocotb tests | Yes |
 | `src/fpga_top.v` | FPGA wrapper with PLL | No |
 | `.fpga/common/pll_25mhz.v` | iCE40 PLL configuration | No |
 
@@ -120,11 +126,37 @@ make flash
 
 ### Workflow Overview
 
-1. **Develop locally** - Edit `src/vga_tt.v` and `src/info.yaml`
+This project uses a dual-sync strategy for TinyTapeout:
+
+1. **Development** - Edit `src/vga_tt.v`, `src/info.yaml`, and `docs/info.md`
 2. **Test on FPGA** - Use `make flash` to verify on hardware
 3. **Run tests** - Use `make test` to verify cocotb tests pass
-4. **Create release** - Use `make tt-release` to package for TT
-5. **Copy to shuttle** - Use `make tt-copy` to sync with shuttle repo
+4. **Push to GitHub** - Changes automatically sync to both:
+   - **Full TT shuttle repo** (`vppillai/tinytapeout-ihp-26a`) - Complete project directory
+   - **Submission template** (`vppillai/tt-vga-submission`) - Clean template structure for official submission
+
+### GitHub Actions Automation
+
+On every push to `main` (or manual workflow trigger), GitHub Actions:
+- Runs cocotb tests
+- Builds FPGA bitstream
+- Generates VGA preview GIF
+- Syncs to full TT shuttle repo (if relevant files changed)
+- Syncs to submission template repo (if relevant files changed)
+
+Manual sync can be triggered from GitHub Actions → CI workflow → "Run workflow"
+
+### Required GitHub Secrets
+
+For the GitHub Actions workflow to push to the TinyTapeout repos, add these secrets to your repository:
+
+1. **`TT_REPO_TOKEN`** - Personal Access Token with `repo` scope for pushing to `vppillai/tinytapeout-ihp-26a`
+2. **`TT_SUBMISSION_TOKEN`** - Personal Access Token with `repo` scope for pushing to `vppillai/tt-vga-submission`
+
+To create tokens:
+1. GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+2. Generate new token with `repo` scope
+3. Add to repository: Settings → Secrets and variables → Actions → New repository secret
 
 ### Create Release Package
 

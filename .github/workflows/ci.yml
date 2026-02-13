@@ -139,7 +139,7 @@ jobs:
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing sync"
           # Check if any TT-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|test/(Makefile|tb\.v|test\.py))$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/info\.md|test/(Makefile|tb\.v|test\.py))$'; then
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "TT-relevant files changed"
           else
@@ -190,4 +190,84 @@ jobs:
           else
             git commit -m "Sync from vga_tt repo"
             git push
+          fi
+
+  sync-submission:
+    name: Sync to TinyTapeout Submission Template
+    runs-on: ubuntu-latest
+    needs: [test, build]
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+          path: vga_tt
+
+      - name: Check for submission-relevant changes
+        id: changes
+        run: |
+          cd vga_tt
+          # Force sync on manual trigger (workflow_dispatch)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "submission_changed=true" >> $GITHUB_OUTPUT
+            echo "Manual trigger - forcing submission sync"
+          # Check if any submission-relevant files changed in this push
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/info\.md|test/(Makefile|tb\.v|test\.py))$'; then
+            echo "submission_changed=true" >> $GITHUB_OUTPUT
+            echo "Submission-relevant files changed"
+          else
+            echo "submission_changed=false" >> $GITHUB_OUTPUT
+            echo "No submission-relevant files changed, skipping sync"
+          fi
+
+      - name: Checkout submission template repo
+        if: steps.changes.outputs.submission_changed == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: vppillai/tt-vga-submission
+          token: ${{ secrets.TT_SUBMISSION_TOKEN }}
+          path: submission-repo
+
+      - name: Sync files to submission template
+        if: steps.changes.outputs.submission_changed == 'true'
+        run: |
+          # Ensure directories exist
+          mkdir -p submission-repo/src
+          mkdir -p submission-repo/test
+          mkdir -p submission-repo/docs
+
+          # Copy source file
+          cp vga_tt/src/vga_tt.v submission-repo/src/
+
+          # Copy info.yaml to root
+          cp vga_tt/src/info.yaml submission-repo/
+
+          # Copy test files
+          cp vga_tt/test/Makefile submission-repo/test/
+          cp vga_tt/test/tb.v submission-repo/test/
+          cp vga_tt/test/test.py submission-repo/test/
+
+          # Copy documentation
+          cp vga_tt/docs/info.md submission-repo/docs/
+
+      - name: Commit and push to submission template repo
+        if: steps.changes.outputs.submission_changed == 'true'
+        run: |
+          cd submission-repo
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger: always commit (even if no changes)
+            git commit --allow-empty -m "Sync from vga_tt repo (manual)"
+            git push
+            echo "Submission template sync complete (forced)"
+          elif git diff --staged --quiet; then
+            echo "No changes to sync to submission template"
+          else
+            git commit -m "Sync from vga_tt repo"
+            git push
+            echo "Submission template sync complete"
           fi
