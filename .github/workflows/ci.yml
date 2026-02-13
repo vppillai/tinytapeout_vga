@@ -139,7 +139,7 @@ jobs:
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing sync"
           # Check if any TT-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md))$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/(vga_tt\.v|info\.yaml|config\.json)|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md|requirements\.txt))$'; then
             echo "tt_changed=true" >> $GITHUB_OUTPUT
             echo "TT-relevant files changed"
           else
@@ -173,6 +173,11 @@ jobs:
           cp vga_tt/test/tb.v "$TT_PROJECT/test/"
           cp vga_tt/test/test.py "$TT_PROJECT/test/"
           cp vga_tt/test/README.md "$TT_PROJECT/test/"
+
+          # Copy requirements.txt if it exists
+          if [ -f vga_tt/test/requirements.txt ]; then
+            cp vga_tt/test/requirements.txt "$TT_PROJECT/test/"
+          fi
 
       - name: Commit and push to TT repo
         if: steps.changes.outputs.tt_changed == 'true'
@@ -215,7 +220,7 @@ jobs:
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing submission sync"
           # Check if any submission-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md)|vga_preview\.gif)$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/(vga_tt\.v|info\.yaml|config\.json)|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md|requirements\.txt)|vga_preview\.gif)$'; then
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Submission-relevant files changed"
           else
@@ -239,8 +244,13 @@ jobs:
           mkdir -p submission-repo/test
           mkdir -p submission-repo/docs
 
-          # Copy source file
+          # Copy source files
           cp vga_tt/src/vga_tt.v submission-repo/src/
+
+          # Copy config.json if it exists, otherwise create default
+          if [ -f vga_tt/src/config.json ]; then
+            cp vga_tt/src/config.json submission-repo/src/
+          fi
 
           # Copy info.yaml to root
           cp vga_tt/src/info.yaml submission-repo/
@@ -250,6 +260,11 @@ jobs:
           cp vga_tt/test/tb.v submission-repo/test/
           cp vga_tt/test/test.py submission-repo/test/
           cp vga_tt/test/README.md submission-repo/test/
+
+          # Copy requirements.txt if it exists, otherwise create default
+          if [ -f vga_tt/test/requirements.txt ]; then
+            cp vga_tt/test/requirements.txt submission-repo/test/
+          fi
 
           # Copy documentation
           cp vga_tt/docs/info.md submission-repo/docs/
