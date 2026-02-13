@@ -2,6 +2,8 @@
 
 A single-tile VGA design for Tiny Tapeout featuring bouncing "EMBEDDEDINN" text with a parallax starfield background.
 
+**Key Features:** Procedural font generation, 640x480 @ 60Hz VGA output, animated starfield.
+
 ![VGA Preview](../vga_preview.gif)
 
 ## What it does
