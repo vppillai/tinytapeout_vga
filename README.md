@@ -138,13 +138,19 @@ This project uses a dual-sync strategy for TinyTapeout:
 ### GitHub Actions Automation
 
 On every push to `main` (or manual workflow trigger), GitHub Actions:
-- Runs cocotb tests
-- Builds FPGA bitstream
-- Generates VGA preview GIF
-- Syncs to full TT shuttle repo (if relevant files changed)
-- Syncs to submission template repo (if relevant files changed)
+- Runs cocotb tests (in parallel, doesn't block sync)
+- Builds FPGA bitstream (in parallel)
+- **Syncs immediately** to both TT repos (fast iteration)
+- Generates VGA preview GIF (after tests pass)
+
+**Fast Iteration:** Sync jobs run immediately without waiting for tests. The submission repo runs comprehensive tests (test, gds, gl_test) that matter for final submission. Local tests are primarily for FPGA development.
 
 Manual sync can be triggered from GitHub Actions → CI workflow → "Run workflow"
+
+**Skip CI entirely:** Add `[skip ci]` or `[ci skip]` to your commit message to skip all workflows:
+```bash
+git commit -m "Update docs [skip ci]"
+```
 
 #### Files Synced to Submission Template
 
