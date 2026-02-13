@@ -106,6 +106,7 @@ tt-release: clean-release
 	@cp test/Makefile test/tb.v test/test.py $(TT_RELEASE_DIR)/test/
 	@# Copy documentation
 	@cp docs/info.md $(TT_RELEASE_DIR)/docs/
+	@cp docs/README.md $(TT_RELEASE_DIR)/
 	@echo ""
 	@echo "TinyTapeout release created in: $(TT_RELEASE_DIR)/"
 	@echo "Contents:"
@@ -126,6 +127,7 @@ tt-copy: tt-release
 	@cp $(TT_RELEASE_DIR)/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
 	@cp $(TT_RELEASE_DIR)/test/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/"
 	@cp $(TT_RELEASE_DIR)/docs/* "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/docs/"
+	@cp $(TT_RELEASE_DIR)/README.md "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
 	@echo "Copied to: $(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/"
 
 # Show differences between local and shuttle repo
@@ -136,6 +138,8 @@ tt-diff:
 	@diff -q src/info.yaml "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/info.yaml" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 	@echo "=== docs/info.md ==="
 	@diff -q docs/info.md "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/docs/info.md" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
+	@echo "=== docs/README.md ==="
+	@diff -q docs/README.md "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/README.md" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 	@echo "=== test/test.py ==="
 	@diff -q test/test.py "$(TT_SHUTTLE_REPO)/projects/$(TT_PROJECT_NAME)/test/test.py" 2>/dev/null && echo "MATCH" || echo "DIFFERS"
 

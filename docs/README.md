@@ -1,0 +1,92 @@
+![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+
+# Cyber EMBEDDEDINN - VGA Bouncing Text
+
+A single-tile VGA design for [Tiny Tapeout](https://tinytapeout.com) featuring bouncing "EMBEDDEDINN" text with a parallax starfield background.
+
+![VGA Preview](https://raw.githubusercontent.com/vppillai/tinytapeout_vga/main/vga_preview.gif)
+
+## Features
+
+- **Bouncing text animation** - "EMBEDDEDINN" bounces smoothly across the screen
+- **Procedurally generated font** - Characters rendered using combinational logic (no ROM)
+- **Parallax starfield** - Dynamic background with depth effect
+- **Standard VGA output** - 640x480 @ 60Hz, 2-bit RGB per channel
+- **Single tile design** - Fits in one 167x108 µm tile
+
+## How it works
+
+### VGA Timing Generator
+Implements standard VGA 640x480 @ 60Hz timing using horizontal and vertical counters. Generates HSYNC and VSYNC signals according to the VGA specification (25.175 MHz pixel clock).
+
+### Generative Font Engine
+Each character in "EMBEDDEDINN" is generated on-the-fly using combinational logic that defines primitive shapes (left bar, right bar, top bar, mid bar, bottom bar). Characters occupy 32x40 pixel slots with proper spacing for readability.
+
+### Animation System
+Frame counter synchronized to VSYNC drives smooth bouncing motion. Text position updates each frame with velocity and direction reversal at screen boundaries, creating stable, glitch-free animation.
+
+### Parallax Starfield
+Background starfield created using XOR patterns that evolve with the frame counter, providing visual depth and a retro aesthetic.
+
+## Pin Configuration
+
+### Inputs
+All inputs are unused (tied internally).
+
+### Outputs (TinyVGA PMOD Compatible)
+
+| Pin | Signal | Description |
+|-----|--------|-------------|
+| uo[0] | R1 | Red MSB |
+| uo[1] | G1 | Green MSB |
+| uo[2] | B1 | Blue MSB |
+| uo[3] | VSYNC | Vertical sync |
+| uo[4] | R0 | Red LSB |
+| uo[5] | G0 | Green LSB |
+| uo[6] | B0 | Blue LSB |
+| uo[7] | HSYNC | Horizontal sync |
+
+### Bidirectional I/O
+All bidirectional pins are unused.
+
+## External Hardware
+
+- **[TinyVGA PMOD](https://github.com/mole99/tiny-vga)** - Provides resistor DAC for 2-bit RGB and VGA connector
+- **VGA Monitor** - Any monitor supporting 640x480 @ 60Hz
+- **VGA Cable** - Standard 15-pin VGA cable
+
+## Testing
+
+The design includes comprehensive cocotb tests that verify:
+- VGA timing compliance (HSYNC/VSYNC periods and polarity)
+- Frame generation timing
+- Color output during active video regions
+- Animation state updates
+
+Run tests locally:
+```bash
+cd test
+make
+```
+
+## Development Repository
+
+This is the TinyTapeout submission package. For the full development repository with FPGA testing, simulation, and build tools, see:
+
+**[vppillai/tinytapeout_vga](https://github.com/vppillai/tinytapeout_vga)**
+
+## Resources
+
+- [VGA timing specifications](http://tinyvga.com/vga-timing/640x480@60Hz)
+- [TinyVGA PMOD documentation](https://github.com/mole99/tiny-vga)
+- [Tiny Tapeout documentation](https://tinytapeout.com)
+
+## What is Tiny Tapeout?
+
+Tiny Tapeout is an educational project that makes it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+
+To learn more and get started, visit https://tinytapeout.com.
+
+## License
+
+MIT

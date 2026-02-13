@@ -128,7 +128,7 @@ make flash
 
 This project uses a dual-sync strategy for TinyTapeout:
 
-1. **Development** - Edit `src/vga_tt.v`, `src/info.yaml`, and `docs/info.md`
+1. **Development** - Edit `src/vga_tt.v`, `src/info.yaml`, `docs/info.md`, and `docs/README.md`
 2. **Test on FPGA** - Use `make flash` to verify on hardware
 3. **Run tests** - Use `make test` to verify cocotb tests pass
 4. **Push to GitHub** - Changes automatically sync to both:
@@ -145,6 +145,24 @@ On every push to `main` (or manual workflow trigger), GitHub Actions:
 - Syncs to submission template repo (if relevant files changed)
 
 Manual sync can be triggered from GitHub Actions → CI workflow → "Run workflow"
+
+#### Files Synced to Submission Template
+
+The following files are automatically synced to `vppillai/tt-vga-submission`:
+
+```
+tt-vga-submission/
+├── README.md              ← from docs/README.md
+├── info.yaml              ← from src/info.yaml
+├── src/
+│   └── vga_tt.v          ← from src/vga_tt.v
+├── test/
+│   ├── Makefile          ← from test/Makefile
+│   ├── tb.v              ← from test/tb.v
+│   └── test.py           ← from test/test.py
+└── docs/
+    └── info.md           ← from docs/info.md
+```
 
 ### Required GitHub Secrets
 
