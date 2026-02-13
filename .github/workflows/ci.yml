@@ -215,7 +215,7 @@ jobs:
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing submission sync"
           # Check if any submission-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md))$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/vga_tt\.v|src/info\.yaml|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md)|vga_preview\.gif)$'; then
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Submission-relevant files changed"
           else
@@ -254,6 +254,11 @@ jobs:
           # Copy documentation
           cp vga_tt/docs/info.md submission-repo/docs/
           cp vga_tt/docs/README.md submission-repo/
+
+          # Copy VGA preview GIF if it exists
+          if [ -f vga_tt/vga_preview.gif ]; then
+            cp vga_tt/vga_preview.gif submission-repo/
+          fi
 
       - name: Commit and push to submission template repo
         if: steps.changes.outputs.submission_changed == 'true'

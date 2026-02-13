@@ -4,7 +4,7 @@
 
 A single-tile VGA design for [Tiny Tapeout](https://tinytapeout.com) featuring bouncing "EMBEDDEDINN" text with a parallax starfield background.
 
-![VGA Preview](https://raw.githubusercontent.com/vppillai/tinytapeout_vga/main/vga_preview.gif)
+![VGA Preview](vga_preview.gif)
 
 ## Features
 
