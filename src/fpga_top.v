@@ -36,7 +36,8 @@ module fpga_top(
 
     // Reset: TinyTapeout uses active-low reset (rst_n)
     // Only release reset when PLL is locked
-    wire rst_n = BTN_N & pll_locked;
+    // Note: BTN_N (pin 44) is floating and not used for reset
+    wire rst_n = pll_locked;
 
     tt_um_embeddedinn_vga tt_project (
         .ui_in  (ui_in),
