@@ -100,7 +100,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add vga_preview.gif
+          git add docs/vga_preview.gif
           if git diff --staged --quiet; then
             echo "No changes to GIF"
           else
@@ -113,8 +113,8 @@ jobs:
         with:
           name: vga-preview
           path: |
-            vga_output.gif
-            vga_preview.gif
+            docs/vga_output.gif
+            docs/vga_preview.gif
           overwrite: true
 
   sync-tt:
@@ -220,7 +220,7 @@ jobs:
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Manual trigger - forcing submission sync"
           # Check if any submission-relevant files changed in this push
-          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/(vga_tt\.v|info\.yaml|config\.json)|docs/(info\.md|README\.md)|test/(Makefile|tb\.v|test\.py|README\.md|requirements\.txt)|vga_preview\.gif)$'; then
+          elif git diff --name-only HEAD~1 HEAD | grep -qE '^(src/(vga_tt\.v|info\.yaml|config\.json)|docs/(info\.md|README\.md|vga_preview\.gif)|test/(Makefile|tb\.v|test\.py|README\.md|requirements\.txt))$'; then
             echo "submission_changed=true" >> $GITHUB_OUTPUT
             echo "Submission-relevant files changed"
           else
@@ -271,8 +271,8 @@ jobs:
           cp vga_tt/docs/README.md submission-repo/
 
           # Copy VGA preview GIF if it exists
-          if [ -f vga_tt/vga_preview.gif ]; then
-            cp vga_tt/vga_preview.gif submission-repo/
+          if [ -f vga_tt/docs/vga_preview.gif ]; then
+            cp vga_tt/docs/vga_preview.gif submission-repo/docs/
           fi
 
       - name: Commit and push to submission template repo

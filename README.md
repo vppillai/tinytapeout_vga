@@ -1,6 +1,6 @@
 # VGA Bouncing Text for TinyTapeout
 
-![VGA Preview](vga_preview.gif)
+![VGA Preview](docs/vga_preview.gif)
 
 Bouncing "EMBEDDEDINN" text with parallax starfield background, designed for [TinyTapeout](https://tinytapeout.com/). Generates 640x480 @ 60Hz VGA output with animated text rendered using procedural gate-logic (no ROM).
 

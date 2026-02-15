@@ -83,9 +83,10 @@ gif:
 	cd test && ./obj_dir/vga_sim
 	@echo "Converting to animated GIFs..."
 	cd test && uv run python make_gif.py
-	@mv test/vga_output.gif test/vga_preview.gif . 2>/dev/null || true
+	@mkdir -p docs
+	@mv test/vga_output.gif test/vga_preview.gif docs/ 2>/dev/null || true
 	@rm -f test/vga_frames.bin
-	@echo "GIFs saved: vga_output.gif (frame-accurate), vga_preview.gif (browser-compensated)"
+	@echo "GIFs saved: docs/vga_output.gif (frame-accurate), docs/vga_preview.gif (browser-compensated)"
 
 # =============================================================================
 # TinyTapeout Release

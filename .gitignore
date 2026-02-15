@@ -18,8 +18,8 @@ sim_build/
 results.xml
 obj_dir/
 vga_frames.bin
-vga_output.gif
-# Note: vga_preview.gif is tracked for README display
+docs/vga_output.gif
+# Note: docs/vga_preview.gif is tracked for README display
 
 # Editor/IDE
 *.swp
