@@ -48,22 +48,32 @@ module tt_um_embeddedinn_vga(
     reg [15:0] frame_cnt;
     reg [8:0] tx, ty;
     reg x_dir, y_dir;
+    reg vsync_prev;
 
-    always @(posedge vsync or negedge rst_n) begin
+    // Detect vsync rising edge (synchronized to clk)
+    wire vsync_rising = vsync && !vsync_prev;
+
+    always @(posedge clk or negedge rst_n) begin
         if (~rst_n) begin
+            vsync_prev <= 0;
             frame_cnt <= 0;
             tx <= 100; ty <= 100;
             x_dir <= 0; y_dir <= 0;
         end else begin
-            frame_cnt <= frame_cnt + 1;
+            vsync_prev <= vsync;
 
-            // Linear Movement
-            tx <= x_dir ? tx - 1 : tx + 1;
-            ty <= y_dir ? ty - 1 : ty + 1;
+            // Update animation state once per frame (on vsync rising edge)
+            if (vsync_rising) begin
+                frame_cnt <= frame_cnt + 1;
 
-            // Screen boundary checks for 640x480
-            if (tx >= 280) x_dir <= 1; else if (tx <= 10) x_dir <= 0;
-            if (ty >= 420) y_dir <= 1; else if (ty <= 10) y_dir <= 0;
+                // Linear Movement
+                tx <= x_dir ? tx - 1 : tx + 1;
+                ty <= y_dir ? ty - 1 : ty + 1;
+
+                // Screen boundary checks for 640x480
+                if (tx >= 280) x_dir <= 1; else if (tx <= 10) x_dir <= 0;
+                if (ty >= 420) y_dir <= 1; else if (ty <= 10) y_dir <= 0;
+            end
         end
     end
 
