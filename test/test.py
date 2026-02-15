@@ -103,7 +103,7 @@ async def test_tt_interface(dut):
     """TEST 1: Verify TT interface - uio_out and uio_oe must be 0"""
     dut._log.info("TEST 1: TT interface check")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")  # 25 MHz
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")  # 25 MHz
     cocotb.start_soon(clock.start())
 
     # Reset
@@ -125,7 +125,7 @@ async def test_hsync_pulse_width(dut):
     """TEST 2: HSYNC pulse width must be 96 clocks +/-1"""
     dut._log.info("TEST 2: HSYNC pulse width")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -154,7 +154,7 @@ async def test_hsync_polarity(dut):
     """TEST 3: HSYNC polarity (active LOW)"""
     dut._log.info("TEST 3: HSYNC polarity")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -179,7 +179,7 @@ async def test_hsync_period(dut):
     """TEST 4: HSYNC period must be 800 clocks +/-2"""
     dut._log.info("TEST 4: HSYNC period")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -211,7 +211,7 @@ async def test_hsync_consistency(dut):
     """TEST 5: HSYNC consistency over 10 lines"""
     dut._log.info("TEST 5: HSYNC consistency")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -244,7 +244,7 @@ async def test_vsync_pulse_width(dut):
     """TEST 6: VSYNC pulse width (2 lines = 1600 clocks +/-800)"""
     dut._log.info("TEST 6: VSYNC pulse width")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -274,7 +274,7 @@ async def test_vsync_polarity(dut):
     """TEST 7: VSYNC polarity (active LOW)"""
     dut._log.info("TEST 7: VSYNC polarity")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -299,7 +299,7 @@ async def test_frame_period(dut):
     """TEST 8: Full frame period (525 lines x 800 = 420000 clocks)"""
     dut._log.info("TEST 8: Frame period")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -334,7 +334,7 @@ async def test_blanking_during_hsync(dut):
     """TEST 9: Pixels must be BLACK during HSYNC"""
     dut._log.info("TEST 9: Blanking during HSYNC")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -366,7 +366,7 @@ async def test_blanking_during_vsync(dut):
     """TEST 10: Pixels must be BLACK during VSYNC"""
     dut._log.info("TEST 10: Blanking during VSYNC")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -397,7 +397,7 @@ async def test_active_region_has_color(dut):
     """TEST 13: Active video region has colored pixels"""
     dut._log.info("TEST 13: Active region color check")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -427,7 +427,7 @@ async def test_color_values_valid(dut):
     """TEST 14: Color values are valid (2-bit RGB, values 0-3)"""
     dut._log.info("TEST 14: Color values validation")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -456,7 +456,7 @@ async def test_animation(dut):
     """TEST 15: Animation - colors change between frames"""
     dut._log.info("TEST 15: Animation detection")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -510,7 +510,7 @@ async def test_reset_recovery(dut):
     """TEST 16: Reset clears state and restarts correctly"""
     dut._log.info("TEST 16: Reset recovery")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
@@ -544,7 +544,7 @@ async def test_consecutive_line_timing(dut):
     """TEST 17: 50 consecutive lines have correct timing"""
     dut._log.info("TEST 17: Consecutive line timing")
 
-    clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
+    clock = Clock(dut.clk, CLK_PERIOD_NS, units="ns")
     cocotb.start_soon(clock.start())
 
     dut.ena.value = 1
