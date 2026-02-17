@@ -43,7 +43,7 @@ module tt_um_embeddedinn_vga(
     );
 
     // =========================================================================
-    // 3. ANIMATION TIMERS (Clean Bouncing)
+    // 3. ANIMATION TIMERS (Interactive Control)
     // =========================================================================
     reg [15:0] frame_cnt;
     reg [8:0] tx, ty;
@@ -52,6 +52,14 @@ module tt_um_embeddedinn_vga(
 
     // Detect vsync rising edge (synchronized to clk)
     wire vsync_rising = vsync && !vsync_prev;
+
+    // Speed control via ui_in[1:0]
+    wire [1:0] speed_sel = ui_in[1:0];
+    wire move_en = (speed_sel == 2'b11) ? 1'b0 : // Pause
+                   (speed_sel == 2'b10) ? frame_cnt[0] : // Slow
+                   1'b1; // Normal and Fast (Fast handled by double increment)
+    
+    wire [1:0] step = (speed_sel == 2'b01) ? 2'd2 : 2'd1;
 
     always @(posedge clk or negedge rst_n) begin
         if (~rst_n) begin
@@ -62,17 +70,18 @@ module tt_um_embeddedinn_vga(
         end else begin
             vsync_prev <= vsync;
 
-            // Update animation state once per frame (on vsync rising edge)
             if (vsync_rising) begin
-                frame_cnt <= frame_cnt + 1;
+                frame_cnt <= frame_cnt + step;
 
-                // Linear Movement
-                tx <= x_dir ? tx - 1 : tx + 1;
-                ty <= y_dir ? ty - 1 : ty + 1;
+                if (move_en) begin
+                    // Linear Movement
+                    tx <= x_dir ? tx - step : tx + step;
+                    ty <= y_dir ? ty - step : ty + step;
 
-                // Screen boundary checks for 640x480
-                if (tx >= 280) x_dir <= 1; else if (tx <= 10) x_dir <= 0;
-                if (ty >= 420) y_dir <= 1; else if (ty <= 10) y_dir <= 0;
+                    // Screen boundary checks for 640x480
+                    if (tx >= 280) x_dir <= 1; else if (tx <= 10) x_dir <= 0;
+                    if (ty >= 420) y_dir <= 1; else if (ty <= 10) y_dir <= 0;
+                end
             end
         end
     end
@@ -114,16 +123,51 @@ module tt_um_embeddedinn_vga(
     end
 
     // =========================================================================
-    // 5. COLOR MIXER (Clean Aesthetic)
+    // 5. COLOR MIXER (Interactive Aesthetic)
     // =========================================================================
-    // Starfield: Moving XOR pattern
-    wire star = (pix_x[4:0] ^ frame_cnt[4:0]) == (pix_y[4:0] ^ frame_cnt[9:5]);
-    wire scanline = pix_y[0];
+    // Parallax Starfield: Two layers with different speeds
+    wire star_f = ((pix_x[5:0] ^ frame_cnt[5:0]) == (pix_y[5:0] ^ frame_cnt[11:6]));
+    wire star_s = ((pix_x[5:0] ^ frame_cnt[7:2]) == (pix_y[5:0] ^ frame_cnt[13:8]));
+    
+    // Scanline effect (toggleable via ui_in[4])
+    wire scanline = pix_y[0] && !ui_in[4];
 
-    // Final color selection: White text over deep blue/purple stars
-    wire [1:0] r = video_active ? (pix ? 2'b11 : (star ? 2'b10 : 2'b00)) : 2'b00;
-    wire [1:0] g = video_active ? (pix ? 2'b11 : 2'b00) : 2'b00;
-    wire [1:0] b = video_active ? (pix ? 2'b11 : (scanline ? 2'b10 : 2'b01)) : 2'b00;
+    // Color Palettes via ui_in[3:2]
+    reg [1:0] pal_r, pal_g, pal_b;
+    always @(*) begin
+        case (ui_in[3:2])
+            2'b01: begin // Cyberpunk (Pink/Cyan)
+                pal_r = star_f ? 2'b11 : 2'b10;
+                pal_g = star_s ? 2'b11 : 2'b00;
+                pal_b = 2'b11;
+            end
+            2'b10: begin // Forest (Green/Emerald)
+                pal_r = 2'b00;
+                pal_g = star_f ? 2'b11 : (star_s ? 2'b10 : 2'b01);
+                pal_b = star_s ? 2'b01 : 2'b00;
+            end
+            2'b11: begin // Monochrome (Grayscale)
+                pal_r = star_f ? 2'b11 : (star_s ? 2'b10 : 2'b01);
+                pal_g = pal_r;
+                pal_b = pal_r;
+            end
+            default: begin // Classic (Deep Blue/Purple)
+                pal_r = star_f ? 2'b01 : 2'b00;
+                pal_g = star_s ? 2'b01 : 2'b00;
+                pal_b = star_f ? 2'b10 : (star_s ? 2'b11 : (scanline ? 2'b01 : 2'b00));
+            end
+        endcase
+    end
+
+    // Color Cycling for Text (Subtle shifts)
+    wire [1:0] text_r = frame_cnt[8] ? 2'b11 : 2'b10;
+    wire [1:0] text_g = frame_cnt[9] ? 2'b11 : 2'b01;
+    wire [1:0] text_b = 2'b11;
+
+    // Final color selection
+    wire [1:0] r = video_active ? (pix ? text_r : pal_r) : 2'b00;
+    wire [1:0] g = video_active ? (pix ? text_g : pal_g) : 2'b00;
+    wire [1:0] b = video_active ? (pix ? text_b : pal_b) : 2'b00;
 
     // Output Packing for TinyVGA PMOD
     assign uo_out = {hsync, b[0], g[0], r[0], vsync, b[1], g[1], r[1]};
@@ -131,7 +175,7 @@ module tt_um_embeddedinn_vga(
     // =========================================================================
     // 6. LINTER TRAP
     // =========================================================================
-    wire _unused = &{ui_in, uio_in, ena, frame_cnt[15:10], ry[9:6]};
+    wire _unused = &{ui_in[7:5], uio_in, ena, frame_cnt[15:14], ry[9:6]};
 
 endmodule
 
