@@ -9,6 +9,7 @@
  * - Rock-solid stable animation
  */
 
+/* verilator lint_off DECLFILENAME */
 module tt_um_embeddedinn_vga(
     input  wire [7:0] ui_in,    // Dedicated inputs
     output wire [7:0] uo_out,   // Dedicated outputs: VGA Pins (PMOD Standard)
@@ -71,12 +72,12 @@ module tt_um_embeddedinn_vga(
             vsync_prev <= vsync;
 
             if (vsync_rising) begin
-                frame_cnt <= frame_cnt + step;
+                frame_cnt <= frame_cnt + {14'b0, step};
 
                 if (move_en) begin
                     // Linear Movement
-                    tx <= x_dir ? tx - step : tx + step;
-                    ty <= y_dir ? ty - step : ty + step;
+                    tx <= x_dir ? tx - {7'b0, step} : tx + {7'b0, step};
+                    ty <= y_dir ? ty - {7'b0, step} : ty + {7'b0, step};
 
                     // Screen boundary checks for 640x480
                     if (tx >= 280) x_dir <= 1; else if (tx <= 10) x_dir <= 0;
