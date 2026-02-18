@@ -30,8 +30,8 @@ jobs:
       - name: Install apio packages
         run: uv run apio packages update --force
 
-      - name: Run cocotb tests
-        run: make test
+      - name: Run cocotb tests (parallel)
+        run: make test-parallel
 
   build:
     name: FPGA Build

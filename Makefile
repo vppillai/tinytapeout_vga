@@ -17,7 +17,7 @@ TT_RELEASE_DIR = ../vga_tt_release
 COMMON_DIR = .fpga/common
 LED_TEST_DIR = .fpga/led_test
 
-.PHONY: all build flash clean test led-test led-build tt-release tt-copy tt-diff help sync-common
+.PHONY: all build flash clean test test-parallel led-test led-build tt-release tt-copy tt-diff help sync-common
 
 # =============================================================================
 # FPGA Targets (VGA Project)
@@ -69,6 +69,11 @@ led-build:
 test:
 	@echo "Running cocotb tests..."
 	cd test && uv run apio raw -- make
+
+# Run cocotb tests in parallel (5 groups, ~2x faster)
+test-parallel:
+	@echo "Running cocotb tests in parallel..."
+	cd test && uv run apio raw -- make -j5 test-parallel
 
 # Generate VGA output GIFs from simulation (fast Verilator-based)
 # Creates both frame-accurate and browser-compensated preview versions
@@ -186,7 +191,8 @@ help:
 	@echo "  make led-test    - Build and flash LED test (PLL verification)"
 	@echo ""
 	@echo "=== Testing ==="
-	@echo "  make test        - Run cocotb tests"
+	@echo "  make test           - Run cocotb tests (sequential)"
+	@echo "  make test-parallel  - Run cocotb tests in parallel (~2x faster)"
 	@echo ""
 	@echo "=== TinyTapeout Release ==="
 	@echo "  make tt-release  - Create TT release package (ready to drop into shuttle repo)"

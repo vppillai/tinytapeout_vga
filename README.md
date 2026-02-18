@@ -9,6 +9,7 @@ Bouncing "EMBEDDEDINN" text with parallax starfield background, designed for [Ti
 - **Bouncing text** "EMBEDDEDINN" with procedurally generated font
 - **Parallax starfield** background for depth effect
 - **No ROM required** - text shapes generated via combinational logic
+- **Interactive controls** - 4 speed modes, 4 color palettes, toggleable scanline effect
 - **VGA 640x480 @ 60Hz** standard timing
 - **TinyTapeout compatible** - standard TT interface
 
@@ -223,18 +224,23 @@ make tt-diff
                     │  │                                                  │
   rst_n ────────────┤──┼─────┐                                           │
                     │  │     │                                           │
-                    │  ▼     ▼                                           │
-                    │ ┌─────────────────┐    ┌──────────────────────┐    │
-                    │ │ hvsync_generator│    │  Text & Starfield    │    │
-                    │ │                 │    │     Renderer         │    │
-                    │ │  hpos[9:0] ─────┼───►│                      │    │
-                    │ │  vpos[9:0] ─────┼───►│  Procedural font     │    │
-                    │ │  hsync ─────────┼────┼──────────────────┐   │    │
-                    │ │  vsync ─────────┼────┼───────────────┐  │   │    │
-                    │ │  display_on ────┼───►│               │  │   │    │
-                    │ └─────────────────┘    └───────┬───────┘  │   │    │
-                    │                                │          │   │    │
-                    │                                ▼          ▼   ▼    │
+  ui_in[7:0] ──────┤──┼─────┼──────────────────┐                        │
+                    │  │     │                  │                        │
+                    │  ▼     ▼                  │                        │
+                    │ ┌─────────────────┐    ┌──┼───────────────────┐    │
+                    │ │ hvsync_generator│    │  │ Text & Starfield  │    │
+                    │ │                 │    │  │    Renderer        │    │
+                    │ │  hpos[9:0] ─────┼───►│  │                   │    │
+                    │ │  vpos[9:0] ─────┼───►│  │ Procedural font   │    │
+                    │ │  hsync ─────────┼────┼──┼────────────────┐  │    │
+                    │ │  vsync ─────────┼────┼──┼─────────────┐  │  │    │
+                    │ │  display_on ────┼───►│  ▼             │  │  │    │
+                    │ └─────────────────┘    │ [1:0] Speed    │  │  │    │
+                    │                        │ [3:2] Palette  │  │  │    │
+                    │                        │ [4]   Scanline │  │  │    │
+                    │                        └───────┬────────┘  │  │    │
+                    │                                │           │  │    │
+                    │                                ▼           ▼  ▼    │
                     │                        ┌─────────────────────────┐ │
                     │                        │    Output Packing       │ │
                     │                        │ {hsync,B0,G0,R0,        │ │

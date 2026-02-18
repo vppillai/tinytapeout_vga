@@ -42,3 +42,39 @@ COCOTB_TEST_MODULES = test
 
 # include cocotb's make rules to take care of the simulator setup
 include $(shell cocotb-config --makefiles)/Makefile.sim
+
+# =============================================================================
+# Parallel test execution (run with: make -j5 test-parallel)
+# =============================================================================
+# Groups balanced by estimated wall time. Each group runs in its own
+# simulator instance with separate build and results directories.
+
+_g_anim:
+	$(MAKE) TESTCASE=test_animation \
+		SIM_BUILD=sim_build/g_anim \
+		COCOTB_RESULTS_FILE=results_anim.xml
+
+_g_speed:
+	$(MAKE) TESTCASE=test_speed_control,test_pause_text_frozen \
+		SIM_BUILD=sim_build/g_speed \
+		COCOTB_RESULTS_FILE=results_speed.xml
+
+_g_visual:
+	$(MAKE) TESTCASE=test_palettes,test_scanline_toggle,test_starfield_variation \
+		SIM_BUILD=sim_build/g_visual \
+		COCOTB_RESULTS_FILE=results_visual.xml
+
+_g_frame:
+	$(MAKE) TESTCASE=test_frame_period,test_blanking_during_vsync,test_active_region_has_color,test_color_values_valid,test_vsync_pulse_width,test_font_at_known_position,test_output_packing_format \
+		SIM_BUILD=sim_build/g_frame \
+		COCOTB_RESULTS_FILE=results_frame.xml
+
+_g_fast:
+	$(MAKE) TESTCASE=test_tt_interface,test_hsync_pulse_width,test_hsync_polarity,test_hsync_period,test_hsync_consistency,test_vsync_polarity,test_blanking_during_hsync,test_reset_recovery,test_consecutive_line_timing \
+		SIM_BUILD=sim_build/g_fast \
+		COCOTB_RESULTS_FILE=results_fast.xml
+
+test-parallel: _g_anim _g_speed _g_visual _g_frame _g_fast
+	@echo "All parallel test groups passed"
+
+.PHONY: test-parallel _g_anim _g_speed _g_visual _g_frame _g_fast

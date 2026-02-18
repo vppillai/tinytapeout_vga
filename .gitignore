@@ -15,7 +15,7 @@ sim_build/
 *.vcd
 *.out
 *.vvp
-results.xml
+results*.xml
 obj_dir/
 vga_frames.bin
 docs/vga_output.gif

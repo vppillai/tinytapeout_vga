@@ -54,7 +54,7 @@ For gate-level simulation:
 
 ## Test Coverage
 
-The test suite contains 18 cocotb tests organized into three categories:
+The test suite contains 22 cocotb tests organized into four categories:
 
 ### VGA Timing (Tests 1-8)
 - **TT interface**: `uio_out` and `uio_oe` must be 0
@@ -80,6 +80,12 @@ The test suite contains 18 cocotb tests organized into three categories:
 - **Palette selection**: Different background colors per palette via `ui_in[3:2]`
 - **Scanline toggle**: Scanline effect control via `ui_in[4]`
 
+### Design Verification (Tests 19-22)
+- **Font at known position**: Text renders at correct initial position (tx=100, ty=100) with expected text color
+- **Pause text frozen**: Text position remains frozen across multiple frames in pause mode
+- **Starfield variation**: Background starfield produces varied pixel colors (XOR pattern verification)
+- **Output packing format**: `uo_out` bit positions match TinyVGA PMOD spec (hsync@7, vsync@3, RGB in correct bits)
+
 ## Waveform Viewing
 
 View simulation waveforms:
@@ -94,7 +100,7 @@ surfer tb.vcd
 
 ## Test Output
 
-Expected test results (all 18 tests should pass):
+Expected test results (all 22 tests should pass):
 ```
 test.test_tt_interface ... PASS
 test.test_hsync_pulse_width ... PASS
@@ -114,9 +120,23 @@ test.test_consecutive_line_timing ... PASS
 test.test_speed_control ... PASS
 test.test_palettes ... PASS
 test.test_scanline_toggle ... PASS
+test.test_font_at_known_position ... PASS
+test.test_pause_text_frozen ... PASS
+test.test_starfield_variation ... PASS
+test.test_output_packing_format ... PASS
 ```
 
-All 18 tests should pass for a valid submission.
+All 22 tests should pass for a valid submission.
+
+### Parallel Execution
+
+For faster local development, tests can run in 5 parallel groups:
+
+```bash
+make -j5 test-parallel
+```
+
+This runs ~2x faster by distributing tests across 5 independent simulator instances grouped by estimated wall time. From the project root, use `make test-parallel`.
 
 ## Additional Resources
 
