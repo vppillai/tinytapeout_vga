@@ -54,21 +54,31 @@ For gate-level simulation:
 
 ## Test Coverage
 
-The test suite verifies:
+The test suite contains 18 cocotb tests organized into three categories:
 
-### VGA Timing
-- **Horizontal timing**: Validates HSYNC period (31.77 µs) and pulse width
-- **Vertical timing**: Validates VSYNC period (16.67 ms) and pulse width
-- **Frame rate**: Confirms 60 Hz frame generation
+### VGA Timing (Tests 1-8)
+- **TT interface**: `uio_out` and `uio_oe` must be 0
+- **HSYNC pulse width**: 96 clocks +/-1
+- **HSYNC polarity**: Active LOW
+- **HSYNC period**: 800 clocks +/-2
+- **HSYNC consistency**: <2 clock jitter over 10 lines
+- **VSYNC pulse width**: 2 lines (1600 clocks +/-800)
+- **VSYNC polarity**: Active LOW
+- **Frame period**: 420000 clocks +/-1600
 
-### Video Output
-- **Active region**: Checks RGB output during visible display area (640x480)
-- **Blanking**: Verifies RGB = 0 during blanking periods
-- **Sync polarity**: Confirms negative polarity for HSYNC and VSYNC
+### Video Output (Tests 9-12)
+- **Blanking during HSYNC**: RGB must be black
+- **Blanking during VSYNC**: RGB must be black
+- **Active region color**: >50 colored pixels per line
+- **Color values valid**: 2-bit RGB, 0-3 range
 
-### Animation
-- **Frame counter**: Verifies frame updates on VSYNC
-- **Text position**: Checks bouncing animation state changes
+### Animation & Features (Tests 13-18)
+- **Animation detection**: Pixel colors change between frames
+- **Reset recovery**: Correct timing after re-asserting reset
+- **Consecutive line timing**: 50 lines with correct period
+- **Speed control**: Normal, Fast, Slow, Pause modes via `ui_in[1:0]`
+- **Palette selection**: Different background colors per palette via `ui_in[3:2]`
+- **Scanline toggle**: Scanline effect control via `ui_in[4]`
 
 ## Waveform Viewing
 
@@ -84,14 +94,29 @@ surfer tb.vcd
 
 ## Test Output
 
-Expected test results:
+Expected test results (all 18 tests should pass):
 ```
-test.test_vga_timing ... PASS
-test.test_frame_generation ... PASS
-test.test_color_output ... PASS
+test.test_tt_interface ... PASS
+test.test_hsync_pulse_width ... PASS
+test.test_hsync_polarity ... PASS
+test.test_hsync_period ... PASS
+test.test_hsync_consistency ... PASS
+test.test_vsync_pulse_width ... PASS
+test.test_vsync_polarity ... PASS
+test.test_frame_period ... PASS
+test.test_blanking_during_hsync ... PASS
+test.test_blanking_during_vsync ... PASS
+test.test_active_region_has_color ... PASS
+test.test_color_values_valid ... PASS
+test.test_animation ... PASS
+test.test_reset_recovery ... PASS
+test.test_consecutive_line_timing ... PASS
+test.test_speed_control ... PASS
+test.test_palettes ... PASS
+test.test_scanline_toggle ... PASS
 ```
 
-All tests should pass for a valid submission.
+All 18 tests should pass for a valid submission.
 
 ## Additional Resources
 

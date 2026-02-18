@@ -394,8 +394,8 @@ async def test_blanking_during_vsync(dut):
 
 @cocotb.test()
 async def test_active_region_has_color(dut):
-    """TEST 13: Active video region has colored pixels"""
-    dut._log.info("TEST 13: Active region color check")
+    """TEST 11: Active video region has colored pixels"""
+    dut._log.info("TEST 11: Active region color check")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -424,8 +424,8 @@ async def test_active_region_has_color(dut):
 
 @cocotb.test()
 async def test_color_values_valid(dut):
-    """TEST 14: Color values are valid (2-bit RGB, values 0-3)"""
-    dut._log.info("TEST 14: Color values validation")
+    """TEST 12: Color values are valid (2-bit RGB, values 0-3)"""
+    dut._log.info("TEST 12: Color values validation")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -453,8 +453,8 @@ async def test_color_values_valid(dut):
 
 @cocotb.test()
 async def test_animation(dut):
-    """TEST 15: Animation - colors change between frames"""
-    dut._log.info("TEST 15: Animation detection")
+    """TEST 13: Animation - colors change between frames"""
+    dut._log.info("TEST 13: Animation detection")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -507,8 +507,8 @@ async def test_animation(dut):
 
 @cocotb.test()
 async def test_reset_recovery(dut):
-    """TEST 16: Reset clears state and restarts correctly"""
-    dut._log.info("TEST 16: Reset recovery")
+    """TEST 14: Reset clears state and restarts correctly"""
+    dut._log.info("TEST 14: Reset recovery")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -541,8 +541,8 @@ async def test_reset_recovery(dut):
 
 @cocotb.test()
 async def test_consecutive_line_timing(dut):
-    """TEST 17: 50 consecutive lines have correct timing"""
-    dut._log.info("TEST 17: Consecutive line timing")
+    """TEST 15: 50 consecutive lines have correct timing"""
+    dut._log.info("TEST 15: Consecutive line timing")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -584,8 +584,8 @@ async def test_consecutive_line_timing(dut):
 
 @cocotb.test()
 async def test_speed_control(dut):
-    """TEST 18: Animation speed control (Normal, Fast, Slow, Pause)"""
-    dut._log.info("TEST 18: Speed control check")
+    """TEST 16: Animation speed control (Normal, Fast, Slow, Pause)"""
+    dut._log.info("TEST 16: Speed control check")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -626,8 +626,8 @@ async def test_speed_control(dut):
 
 @cocotb.test()
 async def test_palettes(dut):
-    """TEST 19: Color palette selection"""
-    dut._log.info("TEST 19: Palette selection check")
+    """TEST 17: Color palette selection"""
+    dut._log.info("TEST 17: Palette selection check")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())
@@ -665,8 +665,8 @@ async def test_palettes(dut):
 
 @cocotb.test()
 async def test_scanline_toggle(dut):
-    """TEST 20: Scanline toggle control"""
-    dut._log.info("TEST 20: Scanline toggle check")
+    """TEST 18: Scanline toggle control"""
+    dut._log.info("TEST 18: Scanline toggle check")
 
     clock = Clock(dut.clk, CLK_PERIOD_NS, unit="ns")
     cocotb.start_soon(clock.start())

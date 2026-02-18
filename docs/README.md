@@ -11,6 +11,7 @@ A single-tile VGA design for [Tiny Tapeout](https://tinytapeout.com) featuring b
 - **Bouncing text animation** - "EMBEDDEDINN" bounces smoothly across the screen
 - **Procedurally generated font** - Characters rendered using combinational logic (no ROM)
 - **Parallax starfield** - Dynamic background with depth effect
+- **Interactive controls** - 4 speed modes, 4 color palettes, toggleable scanline effect
 - **Standard VGA output** - 640x480 @ 60Hz, 2-bit RGB per channel
 - **Single tile design** - Fits in one 167x108 µm tile
 
@@ -23,7 +24,13 @@ Implements standard VGA 640x480 @ 60Hz timing using horizontal and vertical coun
 Each character in "EMBEDDEDINN" is generated on-the-fly using combinational logic that defines primitive shapes (left bar, right bar, top bar, mid bar, bottom bar). Characters occupy 32x40 pixel slots with proper spacing for readability.
 
 ### Animation System
-Frame counter synchronized to VSYNC drives smooth bouncing motion. Text position updates each frame with velocity and direction reversal at screen boundaries, creating stable, glitch-free animation.
+Frame counter synchronized to VSYNC drives smooth bouncing motion. Text position updates each frame with configurable speed and direction reversal at screen boundaries, creating stable, glitch-free animation.
+
+### Interactive Controls
+The design supports real-time control via `ui_in` pins:
+- **Speed** (`ui_in[1:0]`): Normal, Fast (2x), Slow (0.5x), or Pause
+- **Palette** (`ui_in[3:2]`): Classic, Cyberpunk, Forest, or Monochrome color themes
+- **Scanline** (`ui_in[4]`): Toggle retro scanline effect
 
 ### Parallax Starfield
 Background starfield created using XOR patterns that evolve with the frame counter, providing visual depth and a retro aesthetic.
@@ -31,7 +38,19 @@ Background starfield created using XOR patterns that evolve with the frame count
 ## Pin Configuration
 
 ### Inputs
-All inputs are unused (tied internally).
+
+| Pin | Signal | Description |
+|-----|--------|-------------|
+| ui[0] | Speed Sel 0 | Speed selection bit 0 |
+| ui[1] | Speed Sel 1 | Speed selection bit 1 |
+| ui[2] | Palette Sel 0 | Color palette bit 0 |
+| ui[3] | Palette Sel 1 | Color palette bit 1 |
+| ui[4] | Scanline Toggle | Toggle scanline effect (OFF when HIGH) |
+| ui[5:7] | - | Unused |
+
+**Speed Control (`ui_in[1:0]`):** `00` Normal, `01` Fast (2x), `10` Slow (0.5x), `11` Pause
+
+**Color Palettes (`ui_in[3:2]`):** `00` Classic (Deep Blue/Purple), `01` Cyberpunk (Neon Pink/Cyan), `10` Forest (Green/Emerald), `11` Monochrome (Grayscale)
 
 ### Outputs (TinyVGA PMOD Compatible)
 
@@ -57,11 +76,12 @@ All bidirectional pins are unused.
 
 ## Testing
 
-The design includes comprehensive cocotb tests that verify:
-- VGA timing compliance (HSYNC/VSYNC periods and polarity)
-- Frame generation timing
+The design includes 18 cocotb tests that verify:
+- VGA timing compliance (HSYNC/VSYNC periods, polarity, consistency)
+- Frame generation and blanking correctness
 - Color output during active video regions
-- Animation state updates
+- Animation detection and reset recovery
+- Speed control, palette selection, and scanline toggle
 
 Run tests locally:
 ```bash
